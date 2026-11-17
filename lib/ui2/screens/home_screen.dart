@@ -950,27 +950,39 @@ class RingTrio extends StatelessWidget {
       ],
     ];
 
+    // PULSO: recovery is the one number the screen leads with, set huge, and
+    // it is drawn ONCE — as the hero, not also as a ring (two copies of one
+    // figure on one screen is a known bug shape here). Sleep and strain keep
+    // their dials underneath.
+    final hero = rings.firstWhere((r) => r.kind == HomeRingKind.recovery);
+    final rest = [
+      for (final r in rings)
+        if (r.kind != HomeRingKind.recovery) r,
+    ];
+
     return Surface(
       elevation: 2,
       child: Column(children: [
+        _PulsoHero(hero, onTap: _open(HomeRingKind.recovery)),
+        const SizedBox(height: S.x5),
         // Rows replace columns by locale, text scale and width only, never by
         // the day's data: an empty card and a loaded one are the same layout.
         if (bigText(c))
           // Past ~1.3x a 100 pt column cannot hold the word "Recovery" on one
           // line and there is nowhere for it to wrap to. The ring keeps its
           // size and the type gets the width instead.
-          for (var i = 0; i < rings.length; i++) ...[
+          for (var i = 0; i < rest.length; i++) ...[
             if (i > 0) const SizedBox(height: S.x2),
-            _RingRow(rings[i], onTap: _open(rings[i].kind)),
+            _RingRow(rest[i], onTap: _open(rest[i].kind)),
           ]
         else
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for (var i = 0; i < rings.length; i++) ...[
+              for (var i = 0; i < rest.length; i++) ...[
                 if (i > 0) const SizedBox(width: S.x3),
                 Expanded(
-                    child: _RingColumn(rings[i], onTap: _open(rings[i].kind))),
+                    child: _RingColumn(rest[i], onTap: _open(rest[i].kind))),
               ],
             ],
           ),
@@ -1396,9 +1408,9 @@ _RingState _ringOf(HomeRingKind k, HomeData d, AppLocalizations? l) {
       final v = d.strain.value;
       // 0–21 is the scale's own ceiling, not a target invented here.
       return v == null
-          ? _gap(k, l?.homeRingStrain ?? 'Strain', LucideIcons.zap, C.purple,
+          ? _gap(k, l?.homeRingStrain ?? 'Strain', LucideIcons.zap, C.coral,
               d.strain, l?.homeRingNoStrain ?? 'No strain', l, unit: 'days')
-          : _RingState(k, l?.homeRingStrain ?? 'Strain', LucideIcons.zap, C.purple,
+          : _RingState(k, l?.homeRingStrain ?? 'Strain', LucideIcons.zap, C.coral,
               value: displayFixed(v, 1), sub: l?.homeStrainOf21 ?? 'of 21',
               // Bounded 0-21 scale: out of range is bad data, not overflow.
               frac: (v / 21).clamp(0.0, 1.0),
@@ -1407,7 +1419,7 @@ _RingState _ringOf(HomeRingKind k, HomeData d, AppLocalizations? l) {
       final label = l?.homeRingSleep ?? 'Sleep';
       final v = d.sleepMin.value;
       if (v == null) {
-        return _gap(k, label, LucideIcons.moon, C.blue, d.sleepMin,
+        return _gap(k, label, LucideIcons.moon, C.ash, d.sleepMin,
             l?.homeRingNoSleep ?? 'No sleep', l,
             fallbackWhy: l?.homeSleepGapFallback ??
                 'No night long enough to score was recorded.');
@@ -1418,7 +1430,7 @@ _RingState _ringOf(HomeRingKind k, HomeData d, AppLocalizations? l) {
         needMin: d.sleepNeedMin.value,
       );
       final target = hm(m.targetMin);
-      return _RingState(k, label, LucideIcons.moon, C.blue,
+      return _RingState(k, label, LucideIcons.moon, C.ash,
           value: hm(m.asleepMin),
           // The target is the learned need, or the 8 h default — and the
           // default says so. It is never passed off as this user's need.
@@ -1543,6 +1555,57 @@ class _Dial extends StatelessWidget {
 /// The default: three across, the number under the ring rather than inside it.
 /// Inside is where a duration overflows its own circle at the first
 /// accessibility step, and nothing about "7h 45m" gets shorter.
+/// The Pulso headline: the recovery figure as one huge numeral, its band word
+/// under it in the band's own (contrast-solved) colour. When there is no
+/// number — asleep, calibrating, not scored — the state's word is set at title
+/// size in muted ink instead: never a fabricated figure, never an empty hero.
+class _PulsoHero extends StatelessWidget {
+  final _RingState r;
+  final VoidCallback? onTap;
+
+  const _PulsoHero(this.r, {this.onTap});
+
+  @override
+  Widget build(BuildContext c) {
+    final p = P.of(c);
+    // A provisional figure is still a figure — drawn greyed, like the ring did.
+    final numeric = r.measured || (r.provisional && r.why == null);
+    return Pressable(
+      onTap: onTap,
+      semanticLabel: r.spoken,
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // The same overline the dials under it wear, so the three read as
+            // one family.
+            Text(r.label.toUpperCase(), style: F.over.copyWith(color: p.ink3)),
+            const SizedBox(height: S.x1),
+            if (numeric)
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(r.value,
+                    style: F.hero
+                        .copyWith(color: r.provisional ? p.ink3 : p.ink)),
+              )
+            else
+              Text(r.value, style: F.t1.copyWith(color: p.ink3)),
+            if (r.sub.isNotEmpty) ...[
+              const SizedBox(height: S.x3),
+              Text(r.sub,
+                  style: F.body.copyWith(
+                      color: numeric && !r.provisional ? p.on(r.color) : p.ink3,
+                      fontWeight: FontWeight.w600)),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _RingColumn extends StatelessWidget {
   final _RingState r;
   final VoidCallback? onTap;
@@ -2955,7 +3018,7 @@ class _HomeScreenState extends State<HomeScreen> with RevisionReload {
       rows.add(_row(
           p,
           LucideIcons.zap,
-          C.purple,
+          C.coral,
           met
               ? (l?.homeStrainTargetMet ?? 'Strain target met')
               : (l?.homeAimForStrain(displayFixed(aim, 1)) ??
@@ -2977,7 +3040,7 @@ class _HomeScreenState extends State<HomeScreen> with RevisionReload {
       rows.add(_row(
           p,
           LucideIcons.bedDouble,
-          C.blue,
+          C.ash,
           l?.homeSleepNeedRow(hm(need)) ?? '${hm(need)} of sleep',
           l?.homeTonight ?? 'Tonight',
           d.bedtime.value == null

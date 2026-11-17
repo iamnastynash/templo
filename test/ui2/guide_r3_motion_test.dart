@@ -56,7 +56,7 @@ import 'package:openstrap_edge/ui2/guides/guide_motion.dart'; void main() {
         home: Scaffold(body: GuideStepCard(model: const GuideCardOffPath(), onExit: () {}))));
       await t.pumpAndSettle(); // the theme change animates
       final material = t.widget<Material>(find.byKey(GuideStepCard.cardKey)); final color = material.shadowColor!;
-      if (b == Brightness.dark) { expect((color.r, color.g, color.b), (0.0, 0.0, 0.0), reason: 'a true dark shadow, not navy'); } else { expect(color, C.n900); } } });
+      if (b == Brightness.dark) { expect((color.r, color.g, color.b), (0.0, 0.0, 0.0), reason: 'a true dark shadow, not navy'); } else { expect(color, const P(false).shadow); } } });
   // WHY: the ordered policy must drive the mounted card during a real page drag.
   // # catches: a correct motion helper that is not wired to scroll activity/layout.
   testWidgets('G: mounted card holds and fades during scroll, moves, then restores', (t) async { final fixture = R2ScrollFixture();

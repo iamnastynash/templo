@@ -617,10 +617,11 @@ void main() {
         final panel = find.byKey(_panelKey).first;
         final p = P.of(t.element(panel));
         for (final (at, stage, pigment) in [
-          (0.0, 'Light sleep', C.sky),
-          (.25, 'Deep sleep', C.blue),
-          (.75, 'REM', C.teal),
-          (1.0, 'Awake', C.orange),
+          // The hypnogram's own pigment table, so the test follows the palette.
+          (0.0, 'Light sleep', Hypnogram.pigment[SleepStage.light]!),
+          (.25, 'Deep sleep', Hypnogram.pigment[SleepStage.deep]!),
+          (.75, 'REM', Hypnogram.pigment[SleepStage.rem]!),
+          (1.0, 'Awake', Hypnogram.pigment[SleepStage.awake]!),
         ]) {
           await scrub(t, 'Hypnogram', at == 1 ? .9999 : at);
           final caption = find.descendant(

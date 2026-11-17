@@ -820,7 +820,7 @@ class _NearbySection extends StatelessWidget {
     // itself off as a heart-rate sensor.
     final row = SetRow(
       sensorIcon(cand.entryId),
-      C.green,
+      C.brand,
       cand.label ?? cand.entryId,
       sub: busyRemoteId == id
           // A Mi Band 2/3 may wait up to 30 s for a tap on the band, and this

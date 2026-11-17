@@ -34,6 +34,23 @@ import 'package:flutter/material.dart';
 /// them fail AA on white. Run them through [P.on] (accent as text) or
 /// [P.fill] (accent as a filled surface under [P.inkOnFill]) first.
 class C {
+  // ── Pulso ─────────────────────────────────────────────────────────────
+  // The house palette: coral is the one accent, lime marks only what CHANGED
+  // (a delta chip, the active dock tab) and always carries [carbon] ink, never
+  // white. Carbon and paper are the two grounds the light/dark themes sit on.
+  static const coral = Color(0xFFFF6663);
+  static const lime = Color(0xFFE0FF4F);
+  static const carbon = Color(0xFF191919);
+  static const paper = Color(0xFFFEFFFE);
+
+  /// The brand/action accent: primary buttons, tabs, the app mark. Green
+  /// stays for what it MEANS (good, done, improving); this is who we are.
+  static const brand = coral;
+
+  /// Pulso's sleep ink: a warm neutral, so the night reads as calm ink rather
+  /// than another hue competing with coral. Run through [P.on] like any accent.
+  static const ash = Color(0xFF8A8A85);
+
   // primary
   static const green = Color(0xFF22C55E);
   static const greenD = Color(0xFF16A34A);
@@ -110,7 +127,7 @@ class C {
   /// Each domain owns an accent — the mental map is colour-coded, and the map
   /// is the point. Today, Sleep, Activity and Health are the four tabs; food
   /// and mind keep their accents as sections inside Activity and Health.
-  static const domHome = green;
+  static const domHome = coral;
   static const domSleep = indigo;
   static const domHealth = blue;
   static const domFood = orange;
@@ -120,8 +137,8 @@ class C {
   /// Every accent the contrast test sweeps. Adding a colour above without
   /// adding it here means it ships unverified.
   static const all = <Color>[
-    green, greenD, blue, purple, orange, red, teal, yellow, pink, indigo,
-    sky, blueSoft,
+    coral, ash, green, greenD, blue, purple, orange, red, teal, yellow, pink,
+    indigo, sky, blueSoft,
     domHome, domSleep, domHealth, domFood, domMove, domMind,
   ];
 }
@@ -135,24 +152,33 @@ class P {
 
   static P of(BuildContext c) => P(Theme.of(c).brightness == Brightness.dark);
 
-  Color get bg => dark ? const Color(0xFF0B1017) : C.n50;
-  Color get card => dark ? const Color(0xFF151C26) : C.white;
-  Color get card2 => dark ? const Color(0xFF1D2632) : C.n100;
-  Color get line => dark ? const Color(0xFF232D3B) : C.n200;
-  Color get track => dark ? const Color(0xFF232D3B) : C.n200;
+  // Pulso grounds: paper page with warm-grey cards by day, carbon by night.
+  // Neutrals lean very slightly yellow-green toward the lime, not slate-blue.
+  Color get bg => dark ? C.carbon : C.paper;
+  Color get card => dark ? const Color(0xFF222222) : const Color(0xFFF4F5F0);
+  Color get card2 => dark ? const Color(0xFF2B2B2B) : const Color(0xFFECEDE7);
+  Color get line => dark ? const Color(0xFF2E2E2E) : const Color(0xFFE4E5DF);
+  Color get track => dark ? const Color(0xFF2E2E2E) : const Color(0xFFE4E5DF);
 
-  /// The colour an elevated surface casts. Black in the dark theme: a navy
+  /// The colour an elevated surface casts. Black in the dark theme: a grey
   /// shadow is lighter than the dark page and reads as a glow, not a shadow.
-  Color get shadow => dark ? const Color(0xFF000000) : C.n900;
+  Color get shadow => dark ? const Color(0xFF000000) : C.carbon;
 
-  Color get ink => dark ? const Color(0xFFF1F5F9) : C.n900;
-  Color get ink2 => dark ? const Color(0xFF94A3B8) : C.n600;
+  Color get ink => dark ? C.paper : C.carbon;
+  Color get ink2 => dark ? const Color(0xFFB3B3AE) : const Color(0xFF55554F);
 
   /// The muted caption ink. Hand-solved to clear 4.5:1 on [card2], the darkest
   /// (light theme) / lightest (dark theme) surface it can sit on — so it is
   /// legible on every surface, not just the one it was eyeballed against.
-  /// The values it replaces measured 4.34:1 and 3.21:1 respectively.
-  Color get ink3 => dark ? const Color(0xFF7F8DA0) : const Color(0xFF627188);
+  /// Pulso values measure 5.13:1 (light) and 5.01:1 (dark) on card2.
+  Color get ink3 => dark ? const Color(0xFF9A9A95) : const Color(0xFF63635E);
+
+  /// The lime highlight — the "what changed" chip and the active dock tab.
+  /// A surface, never text: always paired with [onHi]. Not in [C.all] because
+  /// [fill] would darken it to olive; lime earns its contrast the other way,
+  /// with carbon ink (≈15.6:1).
+  Color get hi => C.lime;
+  Color get onHi => C.carbon;
 
   /// The ink that goes on top of a [fill]. White by construction — [fill]
   /// darkens the accent until white clears AA on it.
@@ -170,7 +196,7 @@ class P {
   /// solver only ever nudges toward the page ink, so clearing the second
   /// surface cannot un-clear the first.
   Color on(Color accent) {
-    final toward = dark ? ink : C.n900;
+    final toward = ink; // Pulso: darken toward carbon, not navy
     final flat = _solve(accent, toward, card2, dark);
     return _solve(flat, toward, Color.alphaBlend(wash(accent), card2), dark);
   }
@@ -311,6 +337,17 @@ class F {
 
   // Numerals — a parallel display ramp. Tabular, so a live value never jitters
   // its own layout as digits change.
+
+  /// The Pulso hero: one number per screen, set huge and tight. Used only for
+  /// the screen's headline score; everything else stays on n48 and below.
+  static const hero = TextStyle(
+      fontFamily: '.SF Pro Display',
+      fontFamilyFallback: _fb,
+      fontSize: 112,
+      height: .9,
+      fontWeight: FontWeight.w600,
+      letterSpacing: -7.5,
+      fontFeatures: _tab);
   static const n48 = TextStyle(
       fontFamily: _f,
       fontFamilyFallback: _fb,
@@ -503,7 +540,7 @@ ThemeData buildTheme(Brightness b) {
     brightness: b,
     scaffoldBackgroundColor: p.bg,
     colorScheme:
-        ColorScheme.fromSeed(seedColor: C.green, brightness: b, surface: p.card),
+        ColorScheme.fromSeed(seedColor: C.coral, brightness: b, surface: p.card),
     fontFamily: '.SF Pro Text',
     fontFamilyFallback: const ['Manrope'],
     splashFactory: NoSplash.splashFactory,

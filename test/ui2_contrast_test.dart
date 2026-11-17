@@ -35,6 +35,17 @@ void main() {
     });
   });
 
+  group('the Pulso lime highlight carries its own ink', () {
+    themes.forEach((name, p) {
+      test('$name · onHi on hi', () {
+        final r = P.contrast(p.onHi, p.hi);
+        expect(r, greaterThanOrEqualTo(_aa),
+            reason: 'the lime chip label measures ${r.toStringAsFixed(2)}:1 '
+                'in the $name theme.');
+      });
+    });
+  });
+
   group('body ink clears AA on every surface it can land on', () {
     themes.forEach((name, p) {
       final surfaces = {'bg': p.bg, 'card': p.card, 'card2': p.card2};

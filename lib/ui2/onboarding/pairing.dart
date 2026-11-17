@@ -286,7 +286,7 @@ class PairingView extends StatelessWidget {
             ],
             const SizedBox(height: S.x4),
             BigButton(_cta(c, phase),
-                icon: LucideIcons.refreshCw, color: C.green, onTap: onPair),
+                icon: LucideIcons.refreshCw, color: C.brand, onTap: onPair),
             const SizedBox(height: S.x4),
             // The maker's page sits in the steps above when they are general
             // ones; the card does not offer it twice.

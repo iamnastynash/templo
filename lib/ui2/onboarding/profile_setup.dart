@@ -263,7 +263,7 @@ class _ProfileSetupViewState extends State<ProfileSetupView> {
             ),
             const SizedBox(height: S.x5),
             BigButton(l?.actionContinue ?? 'Continue',
-                color: C.green, onTap: _sex == null ? null : _continue),
+                color: C.brand, onTap: _sex == null ? null : _continue),
             if (_sex == null) ...[
               const SizedBox(height: S.x2),
               Text(l?.profileSetupPickOneToContinue ??
@@ -294,14 +294,14 @@ class _Choice extends StatelessWidget {
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: S.x2, vertical: S.x2),
         decoration: BoxDecoration(
-          color: on ? p.wash(C.green) : p.card,
+          color: on ? p.wash(C.brand) : p.card,
           borderRadius: R.rMd,
-          border: Border.all(color: on ? p.on(C.green) : p.line),
+          border: Border.all(color: on ? p.on(C.brand) : p.line),
         ),
         child: Text(label,
             textAlign: TextAlign.center,
             style: F.cap.copyWith(
-                color: on ? p.on(C.green) : p.ink2,
+                color: on ? p.on(C.brand) : p.ink2,
                 fontWeight: on ? FontWeight.w600 : FontWeight.w500)),
       ),
     );
@@ -344,7 +344,7 @@ class _Field extends StatelessWidget {
             enabledBorder:
                 UnderlineInputBorder(borderSide: BorderSide(color: p.line)),
             focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: p.on(C.green))),
+                borderSide: BorderSide(color: p.on(C.brand))),
           ),
         ),
         const SizedBox(height: S.x1),

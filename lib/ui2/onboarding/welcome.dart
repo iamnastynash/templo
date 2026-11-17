@@ -690,7 +690,7 @@ class WelcomeView extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(S.x4, S.x8, S.x4, S.x8),
           children: [
-            Icon(LucideIcons.activity, size: 40, color: p.on(C.green)),
+            Icon(LucideIcons.activity, size: 40, color: p.on(C.brand)),
             const SizedBox(height: S.x5),
             Text(l?.welcomeHeadline ?? 'Your band, decoded here',
                 style: F.display.copyWith(color: p.ink)),
@@ -701,7 +701,7 @@ class WelcomeView extends StatelessWidget {
               style: F.body.copyWith(color: p.ink2),
             ),
             const SizedBox(height: S.x6),
-            Pill(l?.pillLocalNoCloud ?? 'Local · no cloud', C.green,
+            Pill(l?.pillLocalNoCloud ?? 'Local · no cloud', C.brand,
                 icon: LucideIcons.shieldCheck),
             const SizedBox(height: S.x8),
             // With a report to read, the only way on is Continue below it, so
@@ -709,7 +709,7 @@ class WelcomeView extends StatelessWidget {
             if (onContinue == null) ...[
               BigButton(l?.welcomeSetUpMyBand ?? 'Set up my band',
                   icon: LucideIcons.bluetooth,
-                  color: C.green,
+                  color: C.brand,
                   onTap: busy ? null : onNew),
               const SizedBox(height: S.x3),
             ],
@@ -749,7 +749,7 @@ class WelcomeView extends StatelessWidget {
                 const SizedBox(height: S.x4),
                 BigButton(l?.actionContinue ?? 'Continue',
                     icon: LucideIcons.arrowRight,
-                    color: C.green,
+                    color: C.brand,
                     onTap: busy ? null : onContinue),
               ],
             ],

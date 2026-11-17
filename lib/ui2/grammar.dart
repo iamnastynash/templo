@@ -2008,7 +2008,7 @@ class Recommendation extends StatelessWidget {
     this.reason,
     this.action, {
     super.key,
-    this.color = C.green,
+    this.color = C.brand,
     this.onTap,
   });
 
@@ -2400,7 +2400,7 @@ class SubTabs extends StatefulWidget {
     this.index,
     this.onTap, {
     super.key,
-    this.color = C.green,
+    this.color = C.brand,
     this.disabled = const {},
   });
 
@@ -2615,7 +2615,7 @@ class BigButton extends StatelessWidget {
     this.label, {
     super.key,
     this.icon,
-    this.color = C.green,
+    this.color = C.brand,
     this.soft = false,
     this.busy = false,
     this.onTap,

@@ -187,8 +187,13 @@ void main() {
           sleepStages: _stages,
         ),
       );
+      // Pulso: recovery is the hero numeral now, not a dial, so strain is the
+      // one bounded plain Ring left on the card. Recovery's own bound is
+      // checked as text: the figure is the stored value, never a fabricated
+      // clamp, exactly as the dial's centre showed it before.
       final rings = _ringPainters(t).whereType<Ring>().toList();
-      expect(rings, hasLength(2));
+      expect(rings, hasLength(1));
+      expect(find.text('130'), findsOneWidget);
       for (final r in rings) {
         expect(r.v, 1.0);
       }
@@ -244,7 +249,7 @@ void main() {
       expect(painter, isNot(isA<StageRing>()));
       expect(painter, isA<Ring>());
       final ring = painter as Ring;
-      expect(ring.color, _p(t).on(C.blue));
+      expect(ring.color, _p(t).on(C.ash)); // Pulso sleep ink
       expect(ring.v, closeTo(442 / 480, 1e-9));
       expect(ring.solid, isTrue);
     });

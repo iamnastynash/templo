@@ -822,10 +822,12 @@ class Hypnogram extends CustomPainter implements GuidePlot {
   Hypnogram(this.stages, this.p, {this.t = 1});
 
   static const pigment = <SleepStage, Color>{
-    SleepStage.awake: C.orange,
-    SleepStage.rem: C.teal,
-    SleepStage.light: C.sky,
-    SleepStage.deep: C.blue,
+    // Pulso: the night in ink, with REM as the one coral lane and waking
+    // marked in lime. The ramp below still separates every lane by lightness.
+    SleepStage.awake: C.lime,
+    SleepStage.rem: C.coral,
+    SleepStage.light: C.ash,
+    SleepStage.deep: C.carbon,
   };
 
   /// Contrast each lane is drawn at against the worst surface it can sit on,
@@ -853,7 +855,7 @@ class Hypnogram extends CustomPainter implements GuidePlot {
   /// measures [target] against the worst surface. Bisection, like the solver
   /// in theme.dart; the result always clears [target].
   static Color _shade(P p, Color hue, double target) {
-    final toward = p.dark ? C.white : C.n900;
+    final toward = p.dark ? C.white : p.ink; // Pulso: carbon, not navy
     if (_worst(p, hue) >= target) {
       // Already past the step: walk back toward the surface, keeping the
       // last colour that still clears it.
