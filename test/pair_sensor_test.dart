@@ -217,7 +217,7 @@ void main() {
         await _pump(t,
             const PairSensorView(entryLabel: 'Bluetooth heart rate sensor'));
         expect(
-          find.textContaining('deleting OpenStrap also unpairs'),
+          find.textContaining('deleting Templo also unpairs'),
           platform == TargetPlatform.iOS ? findsOneWidget : findsNothing,
         );
         debugDefaultTargetPlatformOverride = null;

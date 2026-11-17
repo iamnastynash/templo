@@ -15,8 +15,8 @@ import '../ui2.dart';
 const _warningFallback =
     'Installing an image you supply yourself can permanently damage your '
     'strap, void its warranty and stop it working. It cannot be undone from '
-    'this app. OpenStrap does not provide, review or endorse any image, and '
-    'OpenStrap and its contributors accept no responsibility or liability for '
+    'this app. Templo does not provide, review or endorse any image, and '
+    'Templo and its contributors accept no responsibility or liability for '
     'any loss or damage. You do this entirely at your own risk.';
 
 enum _PickProblem { tooLarge, unreadable }

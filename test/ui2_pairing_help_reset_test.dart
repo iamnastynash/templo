@@ -9,7 +9,6 @@ import 'package:openstrap_edge/ble/adapters/_registry.dart';
 import 'package:openstrap_edge/ble/band_identity.dart' show PairOutcome;
 import 'package:openstrap_edge/ble/ble_state.dart' show ScanAcceptPolicy;
 import 'package:openstrap_edge/l10n/app_localizations.dart';
-import 'package:openstrap_edge/ui2/community_links.dart';
 import 'package:openstrap_edge/ui2/onboarding/pairing.dart';
 import 'package:openstrap_edge/ui2/pairing/pair_help.dart';
 import 'package:openstrap_edge/ui2/pairing/pair_outcome_text.dart';
@@ -118,18 +117,17 @@ void main() {
     Widget card(List<BandEntry> entries, [PairLinkOpener? links]) => _scroll(
         TroubleConnectingCard(entries: entries, openLink: links ?? _Links()));
 
-    testWidgets('always open: title, body, a link per model, and Discord, with no tap',
+    testWidgets('always open: title, body and a link per model, no community link, with no tap',
         (t) async {
       await pumpPair(t, card([kWhoopGen4, kWhoopGen5]));
       expect(find.byKey(const ValueKey('trouble-connecting')), findsOneWidget);
       expect(find.text('Trouble connecting?'), findsOneWidget);
-      expect(find.text('Put the band in pairing mode, then try again. Still stuck? Ask us.'),
+      expect(find.text('Put the band in pairing mode, then try again.'),
           findsOneWidget);
       expect(find.byKey(ValueKey('trouble-link-${kWhoopGen4.id}')), findsOneWidget);
       expect(find.byKey(ValueKey('trouble-link-${kWhoopGen5.id}')), findsOneWidget);
-      expect(find.byKey(const ValueKey('trouble-link-discord')), findsOneWidget);
-      expect(find.text('Ask on Discord'), findsOneWidget);
-      expect(find.text('The OpenStrap community'), findsOneWidget);
+      // Templo: no OpenStrap Discord.
+      expect(find.byKey(const ValueKey('trouble-link-discord')), findsNothing);
       expect(find.byType(Dialog), findsNothing);
     });
 
@@ -139,11 +137,10 @@ void main() {
       expect(find.text(Uri.parse(kWhoopGen5.resetSteps!.officialUrl!).host), findsOneWidget);
     });
 
-    testWidgets('model links come in entry order, Discord last', (t) async {
+    testWidgets('model links come in entry order', (t) async {
       await pumpPair(t, card([kWhoopGen5, kWhoopGen4]));
       double y(String id) => t.getTopLeft(find.byKey(ValueKey('trouble-link-$id'))).dy;
       expect(y(kWhoopGen5.id), lessThan(y(kWhoopGen4.id)));
-      expect(y(kWhoopGen4.id), lessThan(y('discord')));
       await pumpPair(t, card([kWhoopGen4, kWhoopGen5]));
       expect(y(kWhoopGen4.id), lessThan(y(kWhoopGen5.id)));
     });
@@ -165,12 +162,9 @@ void main() {
       expect(links.opened, [kColmi.resetSteps!.officialUrl]);
     });
 
-    testWidgets('the Discord link opens the community link', (t) async {
-      final links = _Links();
-      await pumpPair(t, card([kWhoopGen5], links));
-      await t.tap(find.byKey(const ValueKey('trouble-link-discord')));
-      expect(links.opened, [kDiscordUrl]);
-      expect(find.byType(Dialog), findsNothing);
+    testWidgets('there is no community link (Templo)', (t) async {
+      await pumpPair(t, card([kWhoopGen5]));
+      expect(find.byKey(const ValueKey('trouble-link-discord')), findsNothing);
     });
 
     testWidgets('(CR r1) a link nothing could open says so, with the address', (t) async {
@@ -178,13 +172,15 @@ void main() {
       // tap did nothing visible and the user had no way to the page.
       // Control first: an opened link says nothing.
       await pumpPair(t, card([kWhoopGen5], _Links()));
-      await t.tap(find.byKey(const ValueKey('trouble-link-discord')));
+      await t.tap(find.byKey(ValueKey('trouble-link-${kWhoopGen5.id}')));
       await t.pump();
       expect(find.textContaining('Could not open the link'), findsNothing);
       await pumpPair(t, card([kWhoopGen5], _Links(false)));
-      await t.tap(find.byKey(const ValueKey('trouble-link-discord')));
+      await t.tap(find.byKey(ValueKey('trouble-link-${kWhoopGen5.id}')));
       await t.pump();
-      expect(find.text('Could not open the link. The address is $kDiscordUrl'),
+      expect(
+          find.text('Could not open the link. The address is '
+              '${kWhoopGen5.resetSteps!.officialUrl}'),
           findsOneWidget);
     });
 
@@ -199,15 +195,15 @@ void main() {
       expect(find.byType(Dialog), findsNothing);
     });
 
-    testWidgets('a device with no official site is left out: Discord only', (t) async {
+    testWidgets('a device with no official site is left out', (t) async {
       await pumpPair(t, card([kBleHrs]));
       expect(find.byKey(ValueKey('trouble-link-${kBleHrs.id}')), findsNothing);
-      expect(find.byKey(const ValueKey('trouble-link-discord')), findsOneWidget);
+      expect(find.byKey(const ValueKey('trouble-link-discord')), findsNothing);
     });
 
-    testWidgets('no entries: Discord only', (t) async {
+    testWidgets('no entries: the body line only', (t) async {
       await pumpPair(t, card(const []));
-      expect(find.text('Ask on Discord'), findsOneWidget);
+      expect(find.text('Ask on Discord'), findsNothing);
       expect(find.textContaining('pairing mode'), findsOneWidget); // the body line
     });
 
@@ -217,12 +213,9 @@ void main() {
       UrlLauncherPlatform.instance = fake;
       addTearDown(() => UrlLauncherPlatform.instance = before);
       await pumpPair(t, _scroll(TroubleConnectingCard(entries: [kWhoopGen5])));
-      await t.tap(find.byKey(const ValueKey('trouble-link-discord')));
-      await t.pump();
       await t.tap(find.byKey(ValueKey('trouble-link-${kWhoopGen5.id}')));
       await t.pump();
       expect(fake.calls, [
-        (kDiscordUrl, PreferredLaunchMode.externalApplication),
         (kWhoopGen5.resetSteps!.officialUrl!, PreferredLaunchMode.externalApplication),
       ]);
     });
@@ -232,7 +225,6 @@ void main() {
           locale: const Locale('de'), textScale: 2, size: const Size(360, 900));
       expect(t.takeException(), isNull);
       expect(find.text('Probleme beim Verbinden?'), findsOneWidget);
-      expect(find.text('Auf Discord fragen'), findsOneWidget);
     });
   });
 
@@ -436,20 +428,18 @@ void main() {
           size: const Size(412, 1400));
       expect(find.byKey(const ValueKey('trouble-connecting')), findsOneWidget);
       expect(find.byKey(ValueKey('trouble-link-${kWhoopGen5.id}')), findsOneWidget);
-      expect(find.byKey(const ValueKey('trouble-link-discord')), findsOneWidget);
+      expect(find.byKey(const ValueKey('trouble-link-discord')), findsNothing);
       await t.tap(find.byKey(ValueKey('trouble-link-${kWhoopGen5.id}')));
       expect(links.opened, [kWhoopGen5.resetSteps!.officialUrl]);
-      await t.tap(find.byKey(const ValueKey('trouble-link-discord')));
-      expect(links.opened.last, kDiscordUrl);
       expect(find.byType(Dialog), findsNothing);
     });
 
-    testWidgets('unless the steps already show it: an unverified device’s card is Discord only',
+    testWidgets('unless the steps already show it: an unverified device’s card has no model link',
         (t) async {
       await pumpPair(t, view(PairPhase.bondRefused, entry: kColmi), size: const Size(412, 1400));
       expect(find.byKey(const ValueKey('trouble-connecting')), findsOneWidget);
       expect(find.byKey(ValueKey('trouble-link-${kColmi.id}')), findsNothing);
-      expect(find.byKey(const ValueKey('trouble-link-discord')), findsOneWidget);
+      expect(find.byKey(const ValueKey('trouble-link-discord')), findsNothing);
       // The maker row in the steps is the one way to the page.
       expect(find.text('Open the maker’s help page'), findsOneWidget);
     });

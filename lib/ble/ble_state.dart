@@ -310,10 +310,10 @@ BandStatus bandStatusFor({
       return const BandStatus(
         BandCondition.bluetoothDenied,
         'Bluetooth is switched off for this app',
-        'The phone is withholding the Bluetooth radio from OpenStrap, so '
+        'The phone is withholding the Bluetooth radio from Templo, so '
             'nothing can be scanned or connected. This is not the band — '
             'walking closer to it will not help.',
-        fix: 'Open Settings → OpenStrap and allow Bluetooth',
+        fix: 'Open Settings → Templo and allow Bluetooth',
       );
     case BleBlocker.adapterOff:
       return const BandStatus(
@@ -385,7 +385,7 @@ BandStatus bandStatusFor({
       'This band runs WHOOP firmware 50.43, which can connect and answer the '
           'app but send no recordings or live heart rate until a '
           'WHOOP-signed membership token is on it. That is one possible '
-          'reason no data is arriving. OpenStrap cannot issue that token. '
+          'reason no data is arriving. Templo cannot issue that token. '
           'Everything already saved here is safe.',
       fix: 'If it is the firmware, nothing in the app changes it, and this '
           'clears once the band sends recordings again',

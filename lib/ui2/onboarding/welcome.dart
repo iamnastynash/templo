@@ -448,7 +448,7 @@ Future<ImportOutcome> runImport(
         (await isNoopExport(p) ? raw : csv).add(p);
       }
     }
-    if (ownDb.isNotEmpty) sources.add('OpenStrap backup');
+    if (ownDb.isNotEmpty) sources.add('Templo backup');
     db.addAll([...plain.where(ownDb.contains), ...decrypted]);
     for (final p in db) {
       days += await app.importEdgeBackup(p);
@@ -690,9 +690,31 @@ class WelcomeView extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(S.x4, S.x8, S.x4, S.x8),
           children: [
-            Icon(LucideIcons.activity, size: 40, color: p.on(C.brand)),
-            const SizedBox(height: S.x5),
-            Text(l?.welcomeHeadline ?? 'Your band, decoded here',
+            // TEMPLO: the app icon and the word mark lead the first screen.
+            Row(children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  borderRadius: R.rLg,
+                  boxShadow: [
+                    BoxShadow(
+                        color: C.coral.withValues(alpha: p.glow),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8)),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: R.rLg,
+                  child: Image.asset('assets/images/icon.png',
+                      width: 64, height: 64, filterQuality: FilterQuality.medium),
+                ),
+              ),
+              const SizedBox(width: S.x4),
+              Text('Templo', style: F.heroWord.copyWith(color: p.ink)),
+            ]),
+            const SizedBox(height: S.x6),
+            Text(l?.welcomeHeadline ?? 'Your body is your temple',
                 style: F.display.copyWith(color: p.ink)),
             const SizedBox(height: S.x3),
             Text(
@@ -735,7 +757,7 @@ class WelcomeView extends StatelessWidget {
               // the same rolling baselines. What IS true is the half that
               // protects data: no import overwrites a day this band measured.
               l?.welcomeImportFooterNote ??
-                  'A sensor export, an OpenStrap backup or a vendor CSV. Imported days count toward your usual range, and never overwrite a day the band measured.',
+                  'A sensor export, a Templo backup or a vendor CSV. Imported days count toward your usual range, and never overwrite a day the band measured.',
               style: F.cap.copyWith(color: p.ink3),
             ),
             if (busy) ...[

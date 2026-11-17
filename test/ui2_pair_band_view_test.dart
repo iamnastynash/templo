@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:openstrap_edge/ble/adapters/_registry.dart';
-import 'package:openstrap_edge/ui2/community_links.dart';
 import 'package:openstrap_edge/ui2/pairing/pair_band_view.dart';
 import 'package:openstrap_edge/ui2/pairing/pair_help.dart' show PairLinkOpener;
 import 'package:openstrap_edge/ui2/pairing/pair_text.dart' show PairFilter;
@@ -201,7 +200,7 @@ void main() {
       expect(find.text('Need a hand pairing?'), findsNothing);
     });
 
-    testWidgets('the Trouble connecting card is always there, with a link per WHOOP and Discord', (t) async {
+    testWidgets('the Trouble connecting card is always there, with a link per WHOOP', (t) async {
       final links = _Links();
       await pumpPair(t, view(links: links), size: const Size(412, 2400));
       expect(find.byKey(const ValueKey('trouble-connecting')), findsOneWidget);
@@ -209,8 +208,7 @@ void main() {
       for (final e in firstRunBandEntries()) {
         expect(find.byKey(ValueKey('trouble-link-${e.id}')), findsOneWidget, reason: e.id);
       }
-      await t.tap(find.byKey(const ValueKey('trouble-link-discord')));
-      expect(links.opened, [kDiscordUrl]);
+      expect(find.byKey(const ValueKey('trouble-link-discord')), findsNothing);
     });
 
     testWidgets('the card stays, unchanged, after trying a device; its links open each model’s page', (t) async {

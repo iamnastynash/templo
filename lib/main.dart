@@ -31,16 +31,24 @@ import 'compute/background_derivation.dart' show kHeavyDeriveTaskName, kSyncTask
 /// first frame always ships.
 const _kStartupInitTimeout = Duration(seconds: 6);
 
+/// Templo ships without Firebase (crash reports, analytics, performance).
+const kTemploFirebase = false;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase (overridden by dummy values until flutterfire configure).
   // OPTIONAL: a build with no real google-services.json / GoogleService-Info.plist
   // throws here and the app carries on without any Firebase at all.
-  try {
-    await FirebaseBridge.initialize(timeout: _kStartupInitTimeout);
-  } catch (e) {
-    debugPrint('Firebase init failed (run flutterfire configure!): $e');
+  // TEMPLO: no Firebase at all. The bundled config is OpenStrap's project,
+  // so nothing may ever reach it; every telemetry path already checks
+  // FirebaseBridge.isInitialized and stays local when it is false.
+  if (kTemploFirebase) {
+    try {
+      await FirebaseBridge.initialize(timeout: _kStartupInitTimeout);
+    } catch (e) {
+      debugPrint('Firebase init failed (run flutterfire configure!): $e');
+    }
   }
   // ZERO COLLECTION UNTIL CONSENT. The SDKs are already told to stay quiet at
   // the platform level (Info.plist / AndroidManifest.xml

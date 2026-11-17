@@ -43,7 +43,7 @@ class WhoopFirmwareWarning extends StatelessWidget {
           const SizedBox(height: S.x3),
           Text(
             l?.whoopFirmwareWarningAction ??
-                'If you use OpenStrap or another open-source app, or plan to '
+                'If you use Templo or another open-source app, or plan to '
                     'switch to one later, do not connect your band to the '
                     'official WHOOP app again. It can install firmware updates '
                     'automatically. Uninstall or disable the WHOOP app to '
@@ -55,7 +55,7 @@ class WhoopFirmwareWarning extends StatelessWidget {
             l?.whoopFirmwareWarningDetails ??
                 'Reports on WHOOP 5.0 / MG firmware 50.43.1.0 and 50.43.2.0 '
                     'describe blocked data access. Bluetooth may still '
-                    'connect. OpenStrap cannot issue the WHOOP-signed '
+                    'connect. Templo cannot issue the WHOOP-signed '
                     'membership token needed to unlock affected bands. '
                     'We are working on a solution, but no fix is available yet.',
             style: F.cap.copyWith(color: p.ink2, height: 1.4),

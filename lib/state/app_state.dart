@@ -3703,7 +3703,7 @@ class AppState extends ChangeNotifier {
   }
 
   void _log(String line) {
-    debugPrint('[OpenStrap] $line');
+    debugPrint('[Templo] $line');
     FileLog.write(line);
     logLines.insert(0, line);
     if (logLines.length > 200) logLines.removeLast();

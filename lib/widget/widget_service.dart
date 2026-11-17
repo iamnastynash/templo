@@ -27,14 +27,14 @@ class WidgetService {
   static String appGroupId = fallbackAppGroupId;
 
   /// WidgetKit "kind" (Swift) / Android provider class name.
-  static const String _iOSName = 'OpenStrapWidget';
+  static const String _iOSName = 'TemploWidget';
 
   /// WidgetKit "kind" for the lock-screen Band Battery widget (Swift).
-  static const String _batteryIOSName = 'OpenStrapBatteryWidget';
-  static const String _androidName = 'OpenStrapWidgetProvider';
+  static const String _batteryIOSName = 'TemploBatteryWidget';
+  static const String _androidName = 'TemploWidgetProvider';
 
   /// Android provider class for the Band Battery widget.
-  static const String _batteryAndroidName = 'OpenStrapBatteryWidgetProvider';
+  static const String _batteryAndroidName = 'TemploBatteryWidgetProvider';
 
   /// The other two faces on the same snapshot: last night's sleep, and the
   /// overnight autonomic pair (HRV + resting HR). They read the keys [push]
@@ -42,8 +42,8 @@ class WidgetService {
   /// nobody told it to re-read is the failure this list exists to stop.
   static const List<(String, String)> _snapshotWidgets = [
     (_iOSName, _androidName),
-    ('OpenStrapSleepWidget', 'SleepWidgetProvider'),
-    ('OpenStrapOvernightWidget', 'OvernightWidgetProvider'),
+    ('TemploSleepWidget', 'SleepWidgetProvider'),
+    ('TemploOvernightWidget', 'OvernightWidgetProvider'),
   ];
 
   static Future<void> _reloadSnapshotWidgets() async {

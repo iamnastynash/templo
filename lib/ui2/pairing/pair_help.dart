@@ -91,13 +91,7 @@ class TroubleConnectingCard extends StatelessWidget {
                   entry: k.entry, heading: false, link: false),
             ),
         ],
-        _LinkRow(
-          key: const ValueKey('trouble-link-discord'),
-          icon: LucideIcons.messagesSquare,
-          title: l.pairTroubleDiscord,
-          sub: l.pairTroubleDiscordSub,
-          onTap: () => openOrSay(c, openLink, kDiscordUrl),
-        ),
+        // TEMPLO: no link to OpenStrap's Discord.
       ]),
     );
   }

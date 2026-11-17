@@ -184,7 +184,7 @@ void main() {
 
       expect(app.backup, [path]);
       expect(app.noop, isEmpty, reason: 'this is the #606 refusal');
-      expect(out.source, contains('OpenStrap backup'));
+      expect(out.source, contains('Templo backup'));
     });
 
     test('a renamed gzipped auto-backup goes to the backup importer',

@@ -44,7 +44,6 @@ import 'data.dart';
 import 'gallery.dart';
 import 'gestures.dart';
 import 'profile.dart';
-import 'report_issue.dart';
 import 'wearable_numbers.dart' show WearableDisplay, wearableSettingsGroup;
 
 /// Unwind the profile stack back to the gate.
@@ -222,7 +221,8 @@ class _MoreSettingsState extends State<MoreSettings>
       // consented under an older build. A consent that cannot be withdrawn is
       // not consent, and the old `lib/ui` toggle died with that package while
       // the pref — and the daily whole-database upload it authorises — did not.
-      showHealthShare: kHealthDataContributionEnabled || app.healthShareConsent,
+      // TEMPLO: never offer uploading the database to OpenStrap.
+      showHealthShare: false,
       healthShare: app.healthShareConsent,
       healthStore: app.healthStoreName,
       healthSync: app.healthSyncEnabled,
@@ -556,7 +556,7 @@ Future<void> _confirmReset(BuildContext c, AppState app) async {
     messenger.showSnackBar(SnackBar(
       content: Text(l?.settingsResetChatGptWarning ??
           'App data deleted, but the ChatGPT sign-in may not be fully removed. '
-              'Disconnect OpenStrap in ChatGPT settings to make sure its access is revoked. '
+              'Disconnect Templo in ChatGPT settings to make sure its access is revoked. '
               'Deleting everything again only retries removing what is left on this device.'),
     ));
   }
@@ -875,17 +875,8 @@ class MoreSettingsView extends StatelessWidget {
                       onTap: () => goto(c, const StepCalibrationScreen())),
                 ]),
                 settingsGroup(c, l?.settingsGroupPrivacy ?? 'Privacy', [
-                  SetRow(LucideIcons.bug, C.orange,
-                      l?.settingsCrashReportsRowTitle ?? 'Crash reports',
-                      sub: l?.settingsCrashReportsRowSub ??
-                          'Nothing is sent until you say so',
-                      value: telemetry ? on : off,
-                      onTap: onToggleTelemetry),
-                  SetRow(LucideIcons.messageSquareWarning, C.orange,
-                      l?.settingsReportIssueRowTitle ?? 'Report an issue',
-                      sub: l?.settingsReportIssueRowSub ??
-                          'Sends what you choose to the maintainers, encrypted',
-                      onTap: () => goto(c, const ReportIssueScreen())),
+                  // TEMPLO: no crash reports and no issue reports — both went
+                  // to OpenStrap's servers.
                   // The food log's one outbound call. Named by what it sends,
                   // not by the feature it powers — a scan is the only thing
                   // that triggers it and the barcode is the whole payload.
@@ -946,11 +937,10 @@ class MoreSettingsView extends StatelessWidget {
                   // Where the licences of what this app uses are written out
                   // in full. Open Food Facts' ODbL asks for the notice to be
                   // reachable, not only for the credit beside the numbers.
-                  SetRow(LucideIcons.scale, C.n500,
-                      l?.settingsNoticesLicencesRowTitle ??
-                          'Notices and licences',
-                      sub: l?.settingsNoticesLicencesRowSub ??
-                          'Who this app is not, and whose data it uses',
+                  // Required attribution (AGPL-3.0, Open Food Facts ODbL):
+                  // Templo is based on OpenStrap Edge.
+                  SetRow(LucideIcons.scale, C.n500, 'Avisos y licencias',
+                      sub: 'Basado en OpenStrap (AGPL-3.0) y datos abiertos',
                       onTap: () => launchUrl(
                           Uri.parse(
                               'https://openstrap.github.io/edge/notice.html'),
