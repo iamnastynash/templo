@@ -1,5 +1,26 @@
 # Notice
 
+## Templo (this fork)
+
+Templo is a modified version of OpenStrap Edge (https://github.com/OpenStrap/edge),
+distributed under the same AGPL-3.0 licence (see `LICENSE`). Modified starting
+2026-11-17. Changes, by area:
+
+- Design system (`lib/ui2/theme.dart`): new palette, day/night grounds, quality
+  colour scale, hero numerals; `lib/ui2/pulso_chart.dart` (GlowLine) is new.
+- New features: `lib/compute/pulso/*`, `lib/state/pulso_store.dart`,
+  `lib/ui2/screens/pulso_*.dart`; Home, Health and the tab bar wire them in.
+- Branding: app name, icons and user-facing strings changed from OpenStrap to
+  Templo; community, donation, crash-report, issue-report and data-contribution
+  features removed; Firebase is not initialised.
+- Tests updated or added for all of the above.
+
+Templo is not affiliated with OpenStrap or WHOOP, Inc.
+
+---
+
+## Original notice (OpenStrap Edge)
+
 Edge is an independent, open-source project (AGPL-3.0, see `LICENSE`; versions up to
 commit 1140dac1 were MIT, see `NOTICE`). It
 is not affiliated with, sponsored by, or endorsed by WHOOP, Inc. or any of its
