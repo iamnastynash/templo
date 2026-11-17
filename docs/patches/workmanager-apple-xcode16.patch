@@ -1,0 +1,50 @@
+--- a/ios/workmanager_apple/Sources/workmanager_apple/BGContinuedProcessingTaskScheduler.swift
++++ b/ios/workmanager_apple/Sources/workmanager_apple/BGContinuedProcessingTaskScheduler.swift
+@@ -42,11 +42,13 @@
+             forTaskIdentifier: request.uniqueName
+         )
+ 
++        #if compiler(>=6.2)
+         WorkmanagerPlugin.scheduleContinuedProcessingTask(
+             withIdentifier: request.uniqueName,
+             title: request.title ?? request.taskName,
+             subtitle: request.subtitle ?? ""
+         )
++        #endif
+ 
+         let taskInfo = TaskDebugInfo(
+             taskName: request.taskName,
+@@ -96,6 +98,7 @@
+         registerLaunchHandlerOnce(forTaskWithIdentifier: identifier, earliestBeginInSeconds: nil)
+     }
+ 
++    #if compiler(>=6.2)
+     @available(iOS 26.0, *)
+     private static func scheduleContinuedProcessingTask(
+         withIdentifier uniqueTaskIdentifier: String,
+@@ -152,4 +155,5 @@
+         operationQueue.addOperation(operation)
+     }
+     #endif
++    #endif
+ }
+--- a/ios/workmanager_apple/Sources/workmanager_apple/WorkmanagerPlugin.swift
++++ b/ios/workmanager_apple/Sources/workmanager_apple/WorkmanagerPlugin.swift
+@@ -837,9 +837,15 @@
+                     earliestBeginInSeconds: earliestBeginInSeconds,
+                     inputData: storedInputData
+                 )
+-            } else if #available(iOS 26.0, *), let task = task as? BGContinuedProcessingTask {
++            }
++            // The three task kinds below are disjoint from BGAppRefreshTask.
++            #if compiler(>=6.2)
++            if #available(iOS 26.0, *), let task = task as? BGContinuedProcessingTask {
+                 handleBGContinuedProcessingTask(identifier: identifier, task: task)
+-            } else if #available(iOS 17.0, *), let task = task as? BGHealthResearchTask {
++                return
++            }
++            #endif
++            if #available(iOS 17.0, *), let task = task as? BGHealthResearchTask {
+                 // BGHealthResearchTask is a subclass of BGProcessingTask, so it
+                 // must be checked before the generic BGProcessingTask branch.
+                 handleBGHealthResearchTask(identifier: identifier, task: task)

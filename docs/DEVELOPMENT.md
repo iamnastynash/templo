@@ -1,5 +1,7 @@
 # Development
 
+> For this fork, see the [Templo installation guide](INSTALACION.md). The build and distribution references below describe the upstream OpenStrap Edge project.
+
 How to build and run OpenStrap Edge from source, and how the pieces fit together.
 For which repo a change belongs in, and tests, see
 [CONTRIBUTING.md](../CONTRIBUTING.md).

@@ -18,3 +18,7 @@ CC BY-SA 3.0, CC BY-SA 4.0 or CC0, and each row keeps its source UUID and the
 author/license credits of its base data and translations. This data stays under
 those licenses, separate from the AGPL-licensed code. Refresh with
 `dart run tool/update_wger_exercises.dart`.
+
+## Templo
+
+Templo es una modificación independiente de [OpenStrap Edge](https://github.com/OpenStrap/edge), basada en el commit `cd64eaa8`. El 17 de noviembre de 2026 se modificó la identidad visual, se añadieron pantallas y cálculos de bienestar y se retiraron las integraciones con los servicios alojados de OpenStrap. Véase el [registro de cambios](CHANGELOG.md). Se conservan el [aviso original](NOTICE), la [GNU AGPL v3](LICENSE) y los avisos de las dependencias.
