@@ -237,7 +237,9 @@ class _DayLoaderState extends State<_DayLoader> {
 
 class PulsoTodayCard extends StatefulWidget {
   final PulsoDay? data;
-  const PulsoTodayCard({super.key, this.data});
+  final bool summary;
+  final Widget? afterEnergy;
+  const PulsoTodayCard({super.key, this.data, this.summary = false, this.afterEnergy});
 
   @override
   State<PulsoTodayCard> createState() => _PulsoTodayCardState();
@@ -267,35 +269,41 @@ class _PulsoTodayCardState extends State<PulsoTodayCard> {
   Widget build(BuildContext c) {
     final p = P.of(c);
     final d = _d;
-    if (d == null) return const SizedBox.shrink();
-    final curve = d.energy;
+    if (d == null && !widget.summary) return const SizedBox.shrink();
+    final curve = d?.energy ?? const <Pt>[];
     final now = curve.isEmpty ? null : curve.last.v;
-    final share = d.dayLoadOf.goodShare;
+    final share = d?.dayLoadOf.goodShare;
+    final es = Localizations.localeOf(c).languageCode == 'es';
+    final label = es ? 'Energía' : 'Energy';
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Surface(
-        onTap: () => go(c, EnergyScreen(data: d)),
-        semanticLabel: now == null ? 'Energía: sin datos' : 'Energía ${now.round()} de 100',
+        onTap: d == null ? null : () => go(c, EnergyScreen(data: d)),
+        semanticLabel: '$label, ${now?.round() ?? '—'}',
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
-            Expanded(child: _over(c, 'Energía')),
+            Expanded(child: _over(c, label)),
             Text(now == null ? '—' : '${now.round()}',
                 style: F.head.copyWith(color: p.ink)),
           ]),
           const SizedBox(height: S.x2),
           if (now != null)
             PulsoBar(now / 100, p.qualityOf(now / 100))
-          else
-            _note(c, 'Aparece cuando la app tenga tu recuperación de hoy.'),
+          else ...[
+            PulsoBar(0, p.hi),
+            const SizedBox(height: S.x2),
+            _note(c, es ? 'Pendiente de sincronizar y calcular' : 'Waiting for sync and recovery data'),
+          ],
           if (curve.length > 1) ...[
             const SizedBox(height: S.x2),
             Row(children: [
-              Expanded(child: _note(c, 'Al despertar ${curve.first.v.round()}')),
-              _note(c, '${(now! - curve.first.v).round()} desde las ${_clock(curve.first.t)}'),
+              Expanded(child: _note(c, '${es ? 'Al despertar' : 'At wake-up'} ${curve.first.v.round()}')),
+              _note(c, '${(now! - curve.first.v).round()} ${es ? 'desde las' : 'since'} ${_clock(curve.first.t)}'),
             ]),
           ],
         ]),
       ),
-      if (share != null) ...[
+      if (widget.afterEnergy case final after?) after,
+      if (!widget.summary && share != null && d != null) ...[
         const SizedBox(height: S.x2),
         Surface(
           onTap: () => go(c, LoadScreen(data: d)),
@@ -307,6 +315,7 @@ class _PulsoTodayCardState extends State<PulsoTodayCard> {
           ]),
         ),
       ],
+      if (d != null && (!widget.summary || (es && (d.readiness != null || d.sleepMin != null)))) ...[
       const SizedBox(height: S.x3),
       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
@@ -324,6 +333,7 @@ class _PulsoTodayCardState extends State<PulsoTodayCard> {
         const SizedBox(width: S.x3),
         Expanded(child: _say(c, consejoDelDia(d))),
       ]),
+      ],
     ]);
   }
 }

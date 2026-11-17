@@ -359,8 +359,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Бег'), findsOneWidget);
-    for (final title in ['Сегодня', 'Сон', 'Активность', 'Здоровье']) {
-      expect(find.text(title), findsOneWidget);
+    for (final title in ['Сегодня', 'Сон', 'Enfoque', 'Здоровье']) {
+      expect(find.byTooltip(title), findsOneWidget);
     }
     expect(tester.takeException(), isNull);
     expect(allActivities.first.typeKey, 'running');

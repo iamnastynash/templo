@@ -19,11 +19,22 @@ import 'sleep_detail.dart';
 import 'wellness_screen.dart';
 
 class SleepTab extends StatelessWidget {
-  const SleepTab({super.key});
+  final bool overview;
+  const SleepTab({super.key, this.overview = false});
 
   @override
   Widget build(BuildContext c) {
     final l = AppLocalizations.of(c);
+    if (overview) {
+      return SleepDetail(
+        embedded: true,
+        onOpenOverview: () => Navigator.of(c).push(
+          MaterialPageRoute<void>(
+            builder: (_) => Scaffold(appBar: AppBar(), body: const SleepTab()),
+          ),
+        ),
+      );
+    }
     return SleepDetail(
       embedded: true,
       todayFooter: [
@@ -35,25 +46,33 @@ class SleepTab extends StatelessWidget {
       footer: [
         Section(
           l?.sleepTabMoreTitle ?? 'Alarm and body clock',
-          Column(children: [
-            detailLinkRow(
+          Column(
+            children: [
+              detailLinkRow(
                 c,
                 LucideIcons.alarmClock,
                 l?.settingsAlarmRowTitle ?? 'Alarm',
                 l?.settingsAlarmRowSub ??
                     'Buzzes on your wrist, on the band’s own clock',
-                () => Navigator.of(c).push(MaterialPageRoute<void>(
-                    builder: (_) => const AlarmScreen()))),
-            const SizedBox(height: S.x3),
-            detailLinkRow(
+                () => Navigator.of(c).push(
+                  MaterialPageRoute<void>(builder: (_) => const AlarmScreen()),
+                ),
+              ),
+              const SizedBox(height: S.x3),
+              detailLinkRow(
                 c,
                 LucideIcons.sunMoon,
                 l?.healthBodyClockTitle ?? 'Body clock',
                 l?.healthChronotypeJetlagRegularity ??
                     'Natural bedtime, weekend shift and schedule consistency',
-                () => Navigator.of(c).push(MaterialPageRoute<void>(
-                    builder: (_) => const CircadianDetail()))),
-          ]),
+                () => Navigator.of(c).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const CircadianDetail(),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         const HelpEntry(topic: GuideTopic.sleep),
       ],

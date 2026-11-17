@@ -44,20 +44,14 @@ Widget _frame(Widget child, Brightness b, double scale) => MediaQuery(
 /// Load the bundled type so text measures as it does on a phone, not as the
 /// test harness's block glyphs.
 Future<void> _loadType() async {
-  final files = Directory('assets/fonts/Manrope')
-      .listSync()
-      .whereType<File>()
-      .where((f) => f.path.endsWith('.ttf'));
-  // Registered under both names. `.SF Pro Text` does not exist off Apple
-  // hardware, so on Android and in the test harness the type IS Manrope —
-  // registering it under the primary name makes text measure as a non-Apple
-  // user sees it, rather than as the harness's fallback blocks.
-  for (final family in const ['Manrope', '.SF Pro Text']) {
+  for (final family in const ['Geist', 'Manrope']) {
+    final files = Directory('assets/fonts/$family')
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.ttf'));
     final loader = FontLoader(family);
     for (final f in files) {
-      loader.addFont(f
-          .readAsBytes()
-          .then((b) => ByteData.sublistView(Uint8List.fromList(b))));
+      loader.addFont(f.readAsBytes().then(ByteData.sublistView));
     }
     await loader.load();
   }
@@ -73,19 +67,18 @@ void main() {
     await _loadType();
   });
 
-  testWidgets('the shell has five destinations (Pulso adds Enfoque last)',
+  testWidgets('the shell shows the four designed tabs in order',
       (tester) async {
     await tester.pumpWidget(MaterialApp(
       theme: buildTheme(Brightness.light),
       home: AppShell(
-        builder: (c, d) => Center(child: Text(d.label)),
+        builder: (c, d) => const SizedBox.shrink(),
       ),
     ));
-    expect(ShellDomain.values, hasLength(5));
-    expect(ShellDomain.values.last, ShellDomain.focus);
-    for (final d in ShellDomain.values) {
-      expect(find.text(d.label), findsWidgets, reason: '${d.label} tab missing');
-    }
+    final tabs = find.byType(Pressable);
+    expect(tabs, findsNWidgets(4));
+    expect(tester.widgetList<Pressable>(tabs).map((tab) => tab.semanticLabel),
+        ['Today', 'Sleep', 'Enfoque', 'Health']);
   });
 
   testWidgets('every tap target in the shell clears 44 pt', (tester) async {

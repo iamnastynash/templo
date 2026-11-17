@@ -100,7 +100,7 @@ class FocusTab extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(S.x4, S.x4, S.x4, S.x16),
             children: [
-              Text('Enfoque', style: F.t1.copyWith(color: p.ink)),
+              Text('Enfoque', style: F.t1.copyWith(color: p.ink, letterSpacing: -1.1)),
               const SizedBox(height: S.x1),
               _note(c, 'Mide cómo te afecta lo que haces, sin contar como ejercicio.'),
               const SizedBox(height: S.x4),
@@ -129,15 +129,14 @@ class FocusTab extends StatelessWidget {
               _card(c, 'Trading', lastLine(FocusKind.trading), 'Empezar',
                   active != null ? null : () => _start(c, FocusKind.trading)),
               const SizedBox(height: S.x2),
-              _card(c, 'Reseteo', 'Respiración guiada por vibración', '60 s',
+              _card(c, 'Reseteo', 'Respiración guiada · inhala 4 s, exhala 6 s', '60 s',
                   () => go(c, const ResetScreen())),
               const SizedBox(height: S.x6),
               _over(c, 'Esta semana'),
               const SizedBox(height: S.x2),
-              _weekRow(c, 'Trabajo',
-                  hm(_sumMin(week, FocusKind.trabajo))),
+              _weekRow(c, 'Trabajo', _weeklyDuration(week, FocusKind.trabajo)),
               _weekRow(c, 'Trading',
-                  '${hm(_sumMin(week, FocusKind.trading))} · ${week.where((s) => s.kind == FocusKind.trading).fold<int>(0, (a, s) => a + s.trades.length)} trades'),
+                  _weeklyDuration(week, FocusKind.trading)),
               _weekRow(
                   c,
                   'Reseteos',
@@ -174,9 +173,15 @@ class FocusTab extends StatelessWidget {
     );
   }
 
-  static double _sumMin(List<FocusSession> w, FocusKind k) => w
-      .where((s) => s.kind == k)
-      .fold<double>(0, (a, s) => a + ((s.end ?? _nowSec()) - s.start) / 60);
+  static String _weeklyDuration(List<FocusSession> week, FocusKind kind) {
+    final sessions = week.where((s) => s.kind == kind && !s.open);
+    if (sessions.isEmpty) return '—';
+    final duration = sessions.fold<int>(0, (total, s) => total + s.end! - s.start);
+    final trades = sessions.fold<int>(0, (total, s) => total + s.trades.length);
+    return kind == FocusKind.trading
+        ? '${hm(duration / 60)} · $trades trades'
+        : hm(duration / 60);
+  }
 
   static String _dayShort(int t) {
     final d = DateTime.fromMillisecondsSinceEpoch(t * 1000);
@@ -192,7 +197,7 @@ class FocusTab extends StatelessWidget {
     final p = P.of(c);
     return Surface(
       onTap: onTap,
-      semanticLabel: '$title. $sub',
+      semanticLabel: '$title. $sub. $action',
       child: Row(children: [
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -201,9 +206,16 @@ class FocusTab extends StatelessWidget {
             _note(c, sub),
           ]),
         ),
-        Text(action,
-            style: F.cap.copyWith(
-                color: onTap == null ? p.ink3 : p.ink, fontWeight: FontWeight.w600)),
+        const SizedBox(width: S.x2),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: S.x2, vertical: S.x1),
+          decoration: BoxDecoration(
+            color: onTap == null ? p.card2 : p.hi,
+            borderRadius: R.rPill,
+          ),
+          child: Text(action, style: F.cap.copyWith(
+              color: onTap == null ? p.ink3 : p.onHi, fontWeight: FontWeight.w600)),
+        ),
       ]),
     );
   }
@@ -245,9 +257,9 @@ class _FocusLiveScreenState extends State<FocusLiveScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _owner = _app(context)?..retainLiveHrView();
       if (!mounted) return;
-    final repo = repoOf(context);
+      _owner = _app(context)?..retainLiveHrView();
+      final repo = repoOf(context);
       if (repo != null) {
         try {
           final d = await PulsoDay.load(repo);
@@ -336,6 +348,17 @@ class _FocusLiveScreenState extends State<FocusLiveScreen> {
                       : base == null
                           ? 'Calculando tu base…'
                           : '${hr - base >= 0 ? '+' : ''}${(hr - base).round()} lpm sobre tu base (${base.round()})'),
+              const SizedBox(height: S.x2),
+              Row(children: [
+                for (final zone in Light.values)
+                  Padding(
+                    padding: const EdgeInsets.only(right: S.x1),
+                    child: Container(width: 22, height: 5, decoration: BoxDecoration(
+                      color: zone == light ? _lightColor(p, zone) : p.card2,
+                      borderRadius: R.rPill,
+                    )),
+                  ),
+              ]),
             ]),
           ),
         ]),

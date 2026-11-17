@@ -18,7 +18,7 @@ BASE TÉCNICA
 - Los datos de salud permanecen en el teléfono por defecto. Desactiva telemetría y servicios remotos por defecto. Usa datos sintéticos para demos y pruebas. Mantén claves, firma y registros personales fuera del repositorio.
 
 PANTALLAS
-- Hoy: recuperación, sueño, esfuerzo, energía estimada a lo largo del día y desglose de actividad frente a carga en reposo. Explica qué señales sustentan cada estimación.
+- Hoy: pulso en vivo al abrir la pestaña, recuperación, sueño, esfuerzo, energía estimada a lo largo del día y desglose de actividad frente a carga en reposo. Muestra el pulso únicamente si llega una lectura reciente de un dispositivo conectado. Permite abrir un gráfico en detalle y detén la solicitud de señal al salir de la pantalla. Explica qué señales sustentan cada estimación.
 - Sueño: duración, horario y tendencias; muestra fases solo si el dato está disponible.
 - Enfoque: sesiones de trabajo y trading iniciadas por el usuario. Si hay pulso en vivo, compáralo con la referencia personal. Permite marcar operaciones, registrar su resultado y revisar la sesión. Incluye una pausa respiratoria con hápticos iniciada manualmente y usa el teléfono como alternativa si la pulsera no ofrece esa capacidad.
 - Salud: pulso en reposo, HRV, resumen cardiovascular, tendencia de ocho semanas y estimación de edad corporal si hay una ventana de datos suficiente. Describe fórmulas y límites. Identifica las estimaciones como indicadores de bienestar y señala de forma expresa cuándo faltan datos.

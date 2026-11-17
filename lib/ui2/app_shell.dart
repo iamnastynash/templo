@@ -1,17 +1,7 @@
-// The four-tab shell.
-//
-// Today · Sleep · Activity · Health. Stable: the contents personalise, the
-// mental map does not. Each domain owns an accent, so colour tells you where
-// you are before the label does. Profile is not a tab; every tab's header
-// carries the avatar into it.
-//
-// There is no fifth tab, and the type system is what says so — [ShellDomain]
-// is a closed enum and [AppShell] takes a builder keyed by it, so "just add a
-// tab for X" is a change to this file with a reviewer attached, not something
-// a screen can do on its own. Anything that feels like another destination is
-// a section or a pushed screen inside the domain that owns it.
+// Stable domain indices for saved selections and deep links.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../l10n/app_localizations.dart';
@@ -201,7 +191,10 @@ class _AppShellState extends State<AppShell> {
                     // old shell built all forty screens' worth of state on launch.
                     for (final d in ShellDomain.values)
                       if (_built.contains(d))
-                        widget.builder(c, d)
+                        TickerMode(
+                          enabled: d == _current,
+                          child: widget.builder(c, d),
+                        )
                       else
                         const SizedBox.shrink(),
                   ],
@@ -226,19 +219,28 @@ class _TabBar extends StatelessWidget {
   @override
   Widget build(BuildContext c) {
     final p = P.of(c);
-    return Container(
-      decoration: BoxDecoration(
-        color: p.card,
-        border: Border(top: BorderSide(color: p.line)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: IntrinsicHeight(
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.only(bottom: S.x2),
+      child: Align(
+        heightFactor: 1,
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: p.dark ? const Color(0xFF2C2C2C) : C.carbon,
+            borderRadius: R.rPill,
+          ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              for (final d in ShellDomain.values)
-                Expanded(
+              for (final d in const [
+                ShellDomain.today,
+                ShellDomain.sleep,
+                ShellDomain.focus,
+                ShellDomain.health,
+              ])
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: _Tab(
                     domain: d,
                     on: d == current,
@@ -263,40 +265,46 @@ class _Tab extends StatelessWidget {
   @override
   Widget build(BuildContext c) {
     final p = P.of(c);
-    final ink = on ? p.on(domain.accent) : p.ink3;
-    final label = domain.title(c);
+    final glyph = switch (domain) {
+      ShellDomain.today =>
+        '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.2"/>',
+      ShellDomain.sleep =>
+        '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+      ShellDomain.focus =>
+        '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3"/>',
+      ShellDomain.health =>
+        '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+      ShellDomain.activity => '',
+    };
     return Semantics(
       selected: on,
-      child: Pressable(
-        onTap: onTap,
-        semanticLabel: label,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-            AnimatedContainer(
-              duration: motion(c, Motion.base),
-              padding: EdgeInsets.symmetric(
-                horizontal: on ? S.x3 : 0,
-                vertical: S.x1,
-              ),
-              decoration: BoxDecoration(
-                color: on ? p.wash(domain.accent) : const Color(0x00000000),
-                borderRadius: R.rPill,
-              ),
-              child: Icon(domain.icon, size: 20, color: ink),
+      child: Tooltip(
+        message: domain.title(c),
+        excludeFromSemantics: true,
+        child: Pressable(
+          onTap: onTap,
+          semanticLabel: domain.title(c),
+          child: AnimatedContainer(
+            duration: motion(c, Motion.base),
+            width: 48,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: on ? p.hi : Colors.transparent,
+              borderRadius: R.rPill,
             ),
-              const SizedBox(height: 3),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-              style: F.over.copyWith(
-                color: ink,
-                fontWeight: on ? FontWeight.w600 : FontWeight.w500,
+            child: SvgPicture.string(
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" '
+              'fill="none" stroke="black" stroke-width="1.8" '
+              'stroke-linecap="round" stroke-linejoin="round">$glyph</svg>',
+              width: 18,
+              height: 18,
+              excludeFromSemantics: true,
+              colorFilter: ColorFilter.mode(
+                on ? p.onHi : const Color(0xFFADADA7),
+                BlendMode.srcIn,
               ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

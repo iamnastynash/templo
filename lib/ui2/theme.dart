@@ -306,7 +306,7 @@ class P {
 /// the golden tests render the same shapes the design was drawn in rather than
 /// silently landing on Roboto.
 class F {
-  static const _f = '.SF Pro Text';
+  static const _f = 'Geist';
   static const _fb = ['Manrope'];
   static const _tab = [FontFeature.tabularFigures()];
 
@@ -361,7 +361,7 @@ class F {
   /// The Pulso hero: one number per screen, set huge and tight. Used only for
   /// the screen's headline score; everything else stays on n48 and below.
   static const hero = TextStyle(
-      fontFamily: '.SF Pro Display',
+      fontFamily: _f,
       fontFamilyFallback: _fb,
       fontSize: 112,
       height: .9,
@@ -370,7 +370,7 @@ class F {
       fontFeatures: _tab);
   /// The Pulso hero for a WORD rather than a number ("Mejorando").
   static const heroWord = TextStyle(
-      fontFamily: '.SF Pro Display',
+      fontFamily: _f,
       fontFamilyFallback: _fb,
       fontSize: 52,
       height: 1,
@@ -579,7 +579,7 @@ ThemeData buildTheme(Brightness b) {
     scaffoldBackgroundColor: p.bg,
     colorScheme:
         ColorScheme.fromSeed(seedColor: C.coral, brightness: b, surface: p.card),
-    fontFamily: '.SF Pro Text',
+    fontFamily: 'Geist',
     fontFamilyFallback: const ['Manrope'],
     splashFactory: NoSplash.splashFactory,
     highlightColor: const Color(0x00000000),

@@ -1,5 +1,11 @@
 # Cambios de Templo
 
+## Rediseño de las pestañas y pulso en vivo
+
+- Hoy muestra el pulso en vivo cuando llega una lectura reciente por Bluetooth. Toca la tarjeta para abrir el gráfico y el historial de pulso en reposo.
+- Hoy, Sueño, Enfoque y Salud comparten la tipografía Geist, la paleta coral y lima y el menú inferior de cuatro iconos.
+- Sueño muestra la duración, el horario, el objetivo y la tendencia cuando existen datos. Enfoque destaca las acciones de Trabajo, Trading y Reseteo. Salud da acceso directo a las métricas de Templo.
+
 ## Primera publicación · 17 de noviembre de 2026
 
 - Nueva identidad de Templo, icono de flor de la vida, paleta coral y lima y modos claro y oscuro.

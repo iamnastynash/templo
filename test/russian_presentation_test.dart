@@ -250,12 +250,9 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
-          final nav = find.text('Активность');
+          final nav = find.byTooltip('Enfoque');
           expect(nav, findsOneWidget);
-          final paragraph = tester.renderObject<RenderParagraph>(nav);
-          expect(paragraph.maxLines, isNull);
-          expect(paragraph.didExceedMaxLines, isFalse);
-          expect(paragraph.size.height, greaterThan(0));
+          expect(tester.getSize(nav).height, greaterThanOrEqualTo(44));
           expect(tester.takeException(), isNull);
           await tester.pumpWidget(
             harness(

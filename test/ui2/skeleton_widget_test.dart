@@ -75,7 +75,7 @@ void main() { group('SkeletonBar / SkeletonBlock', () { testWidgets('take exactl
       // TYPE. If it did not, the overlay would cover and absorb the tabs.
       skTallView(t, w: 400, h: 800); await t.pumpWidget(skHost( Skeletonize( keep: const [], child: AppShell(
             builder: (c, d) => ListView(children: [ Surface(child: Text('page ${d.name}')), ]), ), ), )); await t.pump();
-      expect(find.text('page today'), findsOneWidget); await t.tap(find.text('Sleep')); await t.pump();
+      expect(find.text('page today'), findsOneWidget); await t.tap(find.byTooltip('Sleep')); await t.pump();
       await t.pump(const Duration(milliseconds: 300));
       expect(find.text('page sleep'), findsOneWidget, reason: 'the tab must have switched'); }); });
   group('painting', () { testWidgets('progress 0 leaves pixels alone; 1 covers skeletonized text, not the target', (t) async {
@@ -193,7 +193,7 @@ void main() { group('SkeletonBar / SkeletonBlock', () { testWidgets('take exactl
       skTallView(t, w: 400, h: 800); const root = ValueKey('root'); await t.pumpWidget(skHost(SizedBox( key: root, width: 400, height: 800,
         child: AppShell(builder: (c, d) => Center(child: Text('page ${d.name}'))), )));
       final rects = defaultSkeletonChrome(t.element(find.byKey(root)));
-      final tabs = [for (final l in ['Today', 'Sleep', 'Activity', 'Health']) skLocalRect(t, find.text(l), find.byKey(root))];
+      final tabs = [for (final l in ['Today', 'Sleep', 'Enfoque', 'Health']) skLocalRect(t, find.byTooltip(l), find.byKey(root))];
       expect(rects.any((c) => tabs.every((r) => skContains(c, r))), isTrue, reason: 'one chrome rect must hold all 4 tabs: $rects');
       final page = skLocalRect(t, find.text('page today'), find.byKey(root)); expect(rects.where((c) => c.overlaps(page)), isEmpty); });
     testWidgets('a plain tree has no chrome', (t) async {

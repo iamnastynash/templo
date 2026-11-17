@@ -21,6 +21,8 @@ import 'package:openstrap_analytics/onehz.dart' as ana;
 import 'package:provider/provider.dart';
 
 import '../../compute/vendor_sleep.dart' show vendorStagesReported;
+import '../pulso_chart.dart' show GlowLine;
+import 'pulso_day.dart' show PulsoBar;
 import '../../data/day_label.dart';
 import '../../data/local_repository.dart';
 import '../../l10n/app_localizations.dart';
@@ -467,6 +469,7 @@ class SleepDetail extends StatefulWidget {
   /// profile avatar instead of a back arrow, pull to re-read, and [footer]
   /// (alarm and body clock) under the night.
   final bool embedded;
+  final VoidCallback? onOpenOverview;
   final List<Widget> footer;
 
   /// Rendered above [footer], and only while the night on screen is the
@@ -479,6 +482,7 @@ class SleepDetail extends StatefulWidget {
       this.data,
       this.day,
       this.embedded = false,
+      this.onOpenOverview,
       this.footer = const [],
       this.todayFooter = const []});
 
@@ -637,6 +641,12 @@ class _SleepDetailState extends State<SleepDetail> with RevisionReload {
     } catch (_) {}
     try {
       final d = await SleepData.load(repo, want: _day);
+      if (widget.onOpenOverview != null) {
+        if (mounted && gen == _loadGen) {
+          setState(() => (_d = d, _loading = false, _failed = false));
+        }
+        return;
+      }
       var correctable = true;
       var wholeNightKept = true;
       var confirmable = true;
@@ -708,6 +718,9 @@ class _SleepDetailState extends State<SleepDetail> with RevisionReload {
     final l = AppLocalizations.of(c);
     final p = P.of(c);
     final title = l?.sleepDetailNavTitle ?? 'Sleep';
+    if (widget.onOpenOverview case final openDetails?) {
+      return _dashboard(c, title, d, openDetails);
+    }
     if (_loading && _d == null) {
       return _frame(c, title, [
         const SizedBox(height: S.x8),
@@ -926,6 +939,92 @@ class _SleepDetailState extends State<SleepDetail> with RevisionReload {
       investigateRow(
           c, () => go(c, Investigate('sleep', day: _day ?? d.day))),
     ]);
+  }
+
+  Widget _dashboard(BuildContext c, String title, SleepData d, VoidCallback openDetails) {
+    final p = P.of(c);
+    final l = AppLocalizations.of(c);
+    final es = Localizations.localeOf(c).languageCode == 'es';
+    final night = _failed ? const <String, dynamic>{} : d.night;
+    final minutes = (night['duration_min'] as num?)?.round();
+    final time = minutes == null
+        ? '—'
+        : '${minutes ~/ 60}:${(minutes % 60).toString().padLeft(2, '0')}';
+    final from = clockOfTs(night['onset_ts'] as num?);
+    final to = clockOfTs(night['wake_ts'] as num?);
+    final goal = _failed ? null : d.need.value;
+    final history = [if (!_failed) ...d.tstHistory, if (minutes != null) minutes.toDouble()];
+
+    return RefreshIndicator(
+      onRefresh: _load,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(S.x4, S.x4, S.x4, S.x16),
+        children: [
+          ScreenTitle(title, trailing: const ProfileAvatar(accent: C.coral)),
+          const SizedBox(height: S.x4),
+          Text((l?.sleepDetailTotalSleep ?? 'Total sleep').toUpperCase(),
+              style: F.over.copyWith(color: p.ink3)),
+          const SizedBox(height: S.x1),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(time, style: F.hero.copyWith(
+                  fontSize: 84, letterSpacing: -5, color: p.ink)),
+            ),
+          ),
+          const SizedBox(height: S.x3),
+          if (_loading && _d == null)
+            const LinearProgressIndicator()
+          else if (_failed)
+            Text(l?.wellnessLoadFailedTitle ?? 'This could not be read',
+                style: F.body.copyWith(color: p.ink3))
+          else if (minutes == null)
+            Text(l?.sleepDetailNoNightFix ?? 'Wear the band overnight and sync in the morning',
+                style: F.body.copyWith(color: p.ink3))
+          else ...[
+            if (d.day != null)
+              Text(prettyDay(d.day, l), style: F.cap.copyWith(color: p.ink3)),
+            if (from.isNotEmpty && to.isNotEmpty)
+              Text('$from → $to', style: F.body.copyWith(color: p.ink)),
+          ],
+          const SizedBox(height: S.x4),
+          Surface(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Text(es ? 'OBJETIVO DE SUEÑO' : 'SLEEP TARGET',
+                  style: F.over.copyWith(color: p.ink3)),
+              const SizedBox(height: S.x1),
+              Text(goal == null ? '—' : hm(goal),
+                  style: F.head.copyWith(color: p.ink)),
+              if (minutes != null && goal != null && goal > 0) ...[
+                const SizedBox(height: S.x2),
+                PulsoBar(minutes / goal, p.qualityOf(minutes / goal)),
+              ],
+            ]),
+          ),
+          if (history.length > 1) ...[
+            const SizedBox(height: S.x3),
+            Surface(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Text(es ? 'DURACIÓN RECIENTE' : 'RECENT DURATION',
+                    style: F.over.copyWith(color: p.ink3)),
+                const SizedBox(height: S.x3),
+                GlowLine(history, height: 64, quality: (v) => v / 480),
+              ]),
+            ),
+          ],
+          const SizedBox(height: S.x3),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton(
+              onPressed: openDetails,
+              child: Text(es ? 'Detalle, plan y alarma' : 'Details, plan and alarm'),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Total sleep, when it ran, and the two ratios that qualify it. Everything

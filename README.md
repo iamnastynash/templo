@@ -11,7 +11,7 @@
   </p>
 </div>
 
-Templo nació para seguir usando una WHOOP compatible sin depender de una membresía y para añadir herramientas que echábamos de menos en WHOOP y OpenStrap. Se conecta por Bluetooth y calcula las métricas principales en el teléfono. La app conserva las funciones locales de OpenStrap Edge y añade una interfaz propia en coral y lima con modo día y noche.
+Templo nació para seguir usando una WHOOP compatible sin depender de una membresía y para añadir herramientas que echábamos de menos en WHOOP y OpenStrap. Se conecta por Bluetooth y calcula las métricas principales en el teléfono. La app conserva las funciones locales de OpenStrap Edge y añade una interfaz propia en coral y lima con tipografía Geist, modo día y noche y cuatro pestañas: Hoy, Sueño, Enfoque y Salud.
 
 | <img src="docs/preview/bienvenida.png" width="220" alt="Vista de Templo en iPhone"> | <img src="docs/preview/cardio_dark.png" width="220" alt="Resumen cardiovascular en modo noche"> | <img src="docs/preview/trend_dark.png" width="220" alt="Tendencia de ocho semanas en modo noche"> |
 | :---: | :---: | :---: |
@@ -21,7 +21,8 @@ Las vistas de métricas usan datos de ejemplo.
 
 ## Qué añade Templo
 
-- **Hoy.** Recuperación, sueño y esfuerzo de un vistazo, una estimación de energía y un desglose entre actividad y carga en reposo.
+- **Hoy.** Pulso en vivo al abrir la app, recuperación, esfuerzo y energía estimada. Ponte la banda y mantenla conectada por Bluetooth. Toca el pulso para abrir su gráfico y el historial en reposo.
+- **Sueño.** Duración de la noche, horario, objetivo y tendencia cuando hay suficientes datos.
 - **Enfoque.** Sesiones de trabajo y trading con pulso en vivo cuando hay señal. Marcadores manuales para operaciones y una pausa de respiración guiada.
 - **Salud.** Resumen cardiovascular, tendencias de ocho semanas y una estimación de edad corporal según las métricas disponibles. Son indicadores orientativos de bienestar.
 - **Identidad visual propia.** Icono de flor de la vida y temas claro y oscuro.

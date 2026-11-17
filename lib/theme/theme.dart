@@ -48,20 +48,16 @@ import 'package:flutter/material.dart';
 import 'page_transitions.dart';
 import 'tokens.dart';
 
-/// Type scale — one family (Manrope). Numerics carry tabular figures.
-/// Colours come from the live [AppColors] getters → they track the active mode.
-/// Manrope, bundled as a local asset (pubspec.yaml `flutter.fonts`) rather
-/// than resolved through google_fonts, which fetches the family from
-/// fonts.gstatic.com on first launch — before the consent screen, and contrary
-/// to PRIVACY.md. Same call shape as `GoogleFonts.manrope(...)`, no network.
-TextStyle _manrope({
+/// Bundled Geist typography for screens using the original theme.
+TextStyle _geist({
   double? fontSize,
   FontWeight? fontWeight,
   double? height,
   double? letterSpacing,
   Color? color,
 }) => TextStyle(
-  fontFamily: 'Manrope',
+  fontFamily: 'Geist',
+  fontFamilyFallback: const ['Manrope'],
   fontSize: fontSize,
   fontWeight: fontWeight,
   height: height,
@@ -74,18 +70,15 @@ class AppText {
 
   static const _tnum = [FontFeature.tabularFigures()];
 
-  // ── Display / numerics — Barlow Condensed: heavy, tight, tabular, kinetic ──
-  // Bundled as a local asset (pubspec.yaml `flutter.fonts`), NOT fetched at
-  // runtime via google_fonts — see the file header. `_barlow` is a thin
-  // TextStyle helper standing in for GoogleFonts.barlowCondensed(...); same
-  // call shape, zero network dependency.
-  static TextStyle _barlow({
+  // Display and numeric styles use the same bundled family.
+  static TextStyle _display({
     required double fontSize,
     required FontWeight fontWeight,
     required double height,
     required double letterSpacing,
   }) => TextStyle(
-    fontFamily: 'Barlow Condensed',
+    fontFamily: 'Geist',
+    fontFamilyFallback: const ['Manrope'],
     fontSize: fontSize,
     fontWeight: fontWeight,
     height: height,
@@ -94,25 +87,25 @@ class AppText {
     fontFeatures: _tnum,
   );
 
-  static TextStyle get hero => _barlow(
+  static TextStyle get hero => _display(
     fontSize: 68,
     fontWeight: FontWeight.w800,
     height: 0.96,
     letterSpacing: -0.4,
   );
-  static TextStyle get display => _barlow(
+  static TextStyle get display => _display(
     fontSize: 47,
     fontWeight: FontWeight.w800,
     height: 1.0,
     letterSpacing: -0.2,
   );
-  static TextStyle get metric => _barlow(
+  static TextStyle get metric => _display(
     fontSize: 32,
     fontWeight: FontWeight.w800,
     height: 1.0,
     letterSpacing: -0.1,
   );
-  static TextStyle get metricSm => _barlow(
+  static TextStyle get metricSm => _display(
     fontSize: 23,
     fontWeight: FontWeight.w700,
     height: 1.0,
@@ -120,14 +113,14 @@ class AppText {
   );
 
   // ── Headings ──
-  static TextStyle get h1 => _manrope(
+  static TextStyle get h1 => _geist(
     fontSize: 28,
     fontWeight: FontWeight.w800,
     height: 1.05,
     letterSpacing: -0.7,
     color: AppColors.ink,
   );
-  static TextStyle get h2 => _manrope(
+  static TextStyle get h2 => _geist(
     fontSize: 20,
     fontWeight: FontWeight.w700,
     height: 1.1,
@@ -136,41 +129,41 @@ class AppText {
   );
 
   // ── Body / labels ──
-  static TextStyle get title => _manrope(
+  static TextStyle get title => _geist(
     fontSize: 16,
     fontWeight: FontWeight.w700,
     letterSpacing: -0.15,
     color: AppColors.ink,
   );
-  static TextStyle get body => _manrope(
+  static TextStyle get body => _geist(
     fontSize: 14.5,
     fontWeight: FontWeight.w500,
     height: 1.45,
     color: AppColors.ink,
   );
-  static TextStyle get bodySoft => _manrope(
+  static TextStyle get bodySoft => _geist(
     fontSize: 14.5,
     fontWeight: FontWeight.w500,
     height: 1.45,
     color: AppColors.inkSoft,
   );
-  static TextStyle get label => _manrope(
+  static TextStyle get label => _geist(
     fontSize: 13,
     fontWeight: FontWeight.w700,
     color: AppColors.inkSoft,
     letterSpacing: 0.1,
   );
-  static TextStyle get caption => _manrope(
+  static TextStyle get caption => _geist(
     fontSize: 12,
     fontWeight: FontWeight.w600,
     color: AppColors.inkSoft,
   );
-  static TextStyle get captionMuted => _manrope(
+  static TextStyle get captionMuted => _geist(
     fontSize: 12,
     fontWeight: FontWeight.w600,
     color: AppColors.inkMuted,
   );
-  static TextStyle get overline => _manrope(
+  static TextStyle get overline => _geist(
     fontSize: 11,
     fontWeight: FontWeight.w800,
     letterSpacing: 1.5,
@@ -209,7 +202,8 @@ ThemeData buildOpenStrapTheme(Palette p) {
             ? Typography.material2021().white
             : Typography.material2021().black)
         .apply(
-      fontFamily: 'Manrope',
+      fontFamily: 'Geist',
+      fontFamilyFallback: const ['Manrope'],
       bodyColor: p.ink,
       displayColor: p.ink,
     ),
@@ -236,7 +230,7 @@ ThemeData buildOpenStrapTheme(Palette p) {
       foregroundColor: p.ink,
       elevation: 0,
       centerTitle: false,
-      titleTextStyle: _manrope(
+      titleTextStyle: _geist(
         fontSize: 20,
         fontWeight: FontWeight.w700,
         height: 1.1,
@@ -251,12 +245,12 @@ ThemeData buildOpenStrapTheme(Palette p) {
         horizontal: Sp.x5,
         vertical: Sp.x4,
       ),
-      hintStyle: _manrope(
+      hintStyle: _geist(
         fontSize: 14.5,
         fontWeight: FontWeight.w500,
         color: p.inkMuted,
       ),
-      labelStyle: _manrope(
+      labelStyle: _geist(
         fontSize: 14.5,
         fontWeight: FontWeight.w500,
         color: p.inkSoft,
@@ -288,7 +282,7 @@ ThemeData buildOpenStrapTheme(Palette p) {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(R.pill),
         ),
-        textStyle: _manrope(
+        textStyle: _geist(
           fontSize: 16,
           fontWeight: FontWeight.w800,
         ),
@@ -302,7 +296,7 @@ ThemeData buildOpenStrapTheme(Palette p) {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(R.pill),
         ),
-        textStyle: _manrope(
+        textStyle: _geist(
           fontSize: 15,
           fontWeight: FontWeight.w700,
         ),
@@ -311,7 +305,7 @@ ThemeData buildOpenStrapTheme(Palette p) {
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: p.brandDeep,
-        textStyle: _manrope(
+        textStyle: _geist(
           fontSize: 14,
           fontWeight: FontWeight.w700,
         ),
@@ -320,7 +314,7 @@ ThemeData buildOpenStrapTheme(Palette p) {
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
       backgroundColor: p.isDark ? p.surfaceAlt : AppColors.night,
-      contentTextStyle: _manrope(color: AppColors.onNight),
+      contentTextStyle: _geist(color: AppColors.onNight),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(R.chip),
       ),

@@ -42,7 +42,7 @@ void main() {
   }
 
   Future<void> select(WidgetTester tester, ShellDomain domain) async {
-    await tester.tap(find.text(domain.label));
+    await tester.tap(find.byTooltip(domain.label));
     await tester.pumpAndSettle();
   }
 
@@ -60,7 +60,7 @@ void main() {
     final selected = <ShellDomain>[];
     await mount(tester, onSelect: selected.add);
     await select(tester, ShellDomain.health);
-    await select(tester, ShellDomain.activity);
+    await select(tester, ShellDomain.focus);
 
     await back(tester);
     expect(find.text('screen Health'), findsOneWidget);
@@ -70,7 +70,7 @@ void main() {
     expect(exited(), isFalse);
     expect(selected, [
       ShellDomain.health,
-      ShellDomain.activity,
+      ShellDomain.focus,
       ShellDomain.health,
       ShellDomain.today,
     ], reason: 'Back must also update the tab persisted by the host');
@@ -101,7 +101,7 @@ void main() {
     await mount(tester);
     for (var i = 0; i < 5; i++) {
       await select(tester, ShellDomain.health);
-      await select(tester, ShellDomain.activity);
+      await select(tester, ShellDomain.focus);
     }
     await back(tester);
     expect(find.text('screen Health'), findsOneWidget);
@@ -118,7 +118,7 @@ void main() {
     await mount(tester);
     await select(tester, ShellDomain.health);
     await select(tester, ShellDomain.today);
-    await select(tester, ShellDomain.activity);
+    await select(tester, ShellDomain.focus);
     await back(tester);
     expect(find.text('screen Health'), findsOneWidget);
     await back(tester);

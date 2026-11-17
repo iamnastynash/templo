@@ -33,7 +33,7 @@ import 'ui2/profile/profile.dart';
 import 'ui2/screens/ai_briefing.dart';
 import 'ui2/screens/calm_breathing.dart';
 import 'ui2/screens/what_changed.dart';
-import 'ui2/screens/health_screen.dart';
+import 'ui2/screens/templo_health.dart';
 import 'ui2/screens/pulso_focus.dart' show FocusTab;
 import 'ui2/screens/home_screen.dart';
 import 'ui2/screens/journal_compose.dart';
@@ -709,11 +709,11 @@ class _ShellState extends State<AppMainShell> implements GuideShellLink {
         _selection.value = d;
       },
       builder: (c, d) => switch (d) {
-        ShellDomain.today => const HomeScreen(),
-        ShellDomain.sleep => const SleepTab(),
+        ShellDomain.today => HomeScreen(onOpenActivity: () => _go(ShellDomain.activity)),
+        ShellDomain.sleep => const SleepTab(overview: true),
         ShellDomain.activity => const WorkoutScreen(),
         ShellDomain.focus => const FocusTab(),
-        ShellDomain.health => const HealthScreen(),
+        ShellDomain.health => const TemploHealth(),
       },
     );
   }

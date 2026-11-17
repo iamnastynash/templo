@@ -755,6 +755,16 @@ flutter:
   # SIL Open Font License (OFL.txt alongside the .ttf files, from
   # https://github.com/google/fonts).
   fonts:
+    - family: Geist
+      fonts:
+        - asset: assets/fonts/Geist/Geist-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Geist/Geist-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Geist/Geist-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Geist/Geist-Bold.ttf
+          weight: 700
     - family: Barlow Condensed
       fonts:
         - asset: assets/fonts/BarlowCondensed/BarlowCondensed-Bold.ttf

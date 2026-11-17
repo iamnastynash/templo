@@ -82,6 +82,7 @@ import 'metric_detail.dart';
 import 'readiness_detail.dart';
 import 'pulso_day.dart' show PulsoTodayCard;
 import 'sleep_detail.dart';
+import 'templo_today.dart';
 
 // ═══════════════════ shared plumbing ═══════════════════
 
@@ -2084,8 +2085,9 @@ class HomeScreen extends StatefulWidget {
   /// calendar, so a test of "a day later" needs to move it.
   final DateTime? now;
 
-  const HomeScreen(
-      {super.key, this.data, this.hour, this.workoutLive, this.now});
+  final VoidCallback? onOpenActivity;
+
+  const HomeScreen({super.key, this.data, this.hour, this.workoutLive, this.now, this.onOpenActivity});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -2415,6 +2417,31 @@ class _HomeScreenState extends State<HomeScreen> with RevisionReload {
     final p = P.of(c);
     final l = AppLocalizations.of(c);
     final d = _d;
+    if (widget.onOpenActivity case final openActivity?) {
+      final sync = syncOf(c);
+      final status = _phaseStatusCard(c, l) ?? noBandCard(c, l);
+      return _refreshable(ListView(padding: pad, children: [
+        if (dbRebuiltCard(dbRebuildOf(c), l) case final rebuilt?) rebuilt,
+        if (d != null) ...?_bodyWatch(c, d, todayLabel(widget.now)),
+        TemploToday(
+          date: prettyDay(todayLabel(widget.now), l),
+          data: d,
+          revision: d,
+          status: status ?? (d?.readiness.value == null && sync != null
+              ? Align(alignment: Alignment.centerLeft, child: TextButton.icon(
+                  onPressed: () => _tapSync(sync),
+                  icon: const Icon(LucideIcons.refreshCw),
+                  label: Text(l?.homeSyncBand ?? 'Sync the band'),
+                ))
+              : null),
+          onRecovery: () => go(c, const ReadinessDetail()),
+          onStrain: () => go(c, const DayStrainDetail()),
+          onSleep: () => go(c, const SleepDetail()),
+          onHistory: () => go(c, Scaffold(appBar: AppBar(), body: const HomeScreen())),
+          onActivity: openActivity,
+        ),
+      ]));
+    }
     final g = _greeting(widget.hour ?? DateTime.now().hour, l);
 
     if (d == null) {
