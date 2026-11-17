@@ -244,6 +244,10 @@ Map<String, Widget> componentCases() => {
             child: CustomPaint(
                 size: Size.infinite, painter: LineChart(_series, C.purple)),
           )),
+      // Pulso: one line in its quality colours (a short night dips it red).
+      'pulso_bar': PulsoBar(.64, C.lime),
+      'glow_line': GlowLine(const [7.2, 7.6, 7.9, 6.2, 6.8, 7.4, 7.1, 7.3],
+          quality: (v) => (v - 6) / 2),
       'metric_row': const Column(children: [
         // The trailing states, in order: good news up, bad news up, bad news
         // DOWN (the arrow that no fixture used to reach), a move inside its

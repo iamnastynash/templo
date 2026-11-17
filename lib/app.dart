@@ -34,6 +34,7 @@ import 'ui2/screens/ai_briefing.dart';
 import 'ui2/screens/calm_breathing.dart';
 import 'ui2/screens/what_changed.dart';
 import 'ui2/screens/health_screen.dart';
+import 'ui2/screens/pulso_focus.dart' show FocusTab;
 import 'ui2/screens/home_screen.dart';
 import 'ui2/screens/journal_compose.dart';
 import 'ui2/screens/log_workout.dart';
@@ -711,6 +712,7 @@ class _ShellState extends State<AppMainShell> implements GuideShellLink {
         ShellDomain.today => const HomeScreen(),
         ShellDomain.sleep => const SleepTab(),
         ShellDomain.activity => const WorkoutScreen(),
+        ShellDomain.focus => const FocusTab(),
         ShellDomain.health => const HealthScreen(),
       },
     );

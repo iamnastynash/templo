@@ -192,6 +192,17 @@ void main() {
 /// this list fails the test above, so the choice has to be made rather than
 /// drifted into.
 const _notComponents = {
+  // Pulso screens: they read the repository.
+  'CardioScreen',
+  'TrendScreen',
+  'FocusTab',
+  'FocusLiveScreen',
+  'FocusSummaryScreen',
+  'ResetScreen',
+  'EnergyScreen',
+  'LoadScreen',
+  'BodyAgeScreen',
+  'PulsoTodayCard',
   // shell and routing
   'AppShell', 'Domain', 'GalleryScreen',
   // WHOOP MG ECG routes: the Heart Screener entry reads the database and

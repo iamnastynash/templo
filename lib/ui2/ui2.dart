@@ -18,4 +18,5 @@ export 'scroll_hint.dart';
 export 'sleep_ring_model.dart';
 export 'spiral_ring.dart';
 export 'theme.dart';
+export 'pulso_chart.dart';
 export 'trend.dart';

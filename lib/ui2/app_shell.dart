@@ -23,7 +23,11 @@ enum ShellDomain {
   today('Today', LucideIcons.house, C.domHome),
   sleep('Sleep', LucideIcons.moon, C.domSleep),
   activity('Activity', LucideIcons.dumbbell, C.domMove),
-  health('Health', LucideIcons.heartPulse, C.domHealth);
+  health('Health', LucideIcons.heartPulse, C.domHealth),
+
+  /// Pulso: Trabajo, Trading and Reseteo. LAST, so every tab index the
+  /// guides, deep links and the saved tab already use keeps its meaning.
+  focus('Enfoque', LucideIcons.crosshair, C.coral);
 
   const ShellDomain(this.label, this.icon, this.accent);
 
@@ -38,6 +42,7 @@ enum ShellDomain {
           ShellDomain.today => l?.tabToday,
           ShellDomain.sleep => l?.tabSleep,
           ShellDomain.activity => l?.tabActivity,
+          ShellDomain.focus => null,
           ShellDomain.health => l?.tabHealth,
         } ??
         label;

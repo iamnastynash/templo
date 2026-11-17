@@ -180,6 +180,26 @@ class P {
   Color get hi => C.lime;
   Color get onHi => C.carbon;
 
+  /// The Pulso QUALITY scale, bad → good: red, orange, yellow, lime-green.
+  /// A chart colours each point by how good its value is (lower resting HR,
+  /// higher HRV, 8 h of sleep), so a line changes colour when a night does.
+  /// Darker stops by day so a mark still reads on paper. Marks only: text in
+  /// one of these goes through [on] like any accent.
+  List<Color> get quality => dark
+      ? const [Color(0xFFFF6663), Color(0xFFFFAA5A), Color(0xFFF2D547), Color(0xFFB4F05A)]
+      : const [Color(0xFFC9443F), Color(0xFFC8701A), Color(0xFFA08400), Color(0xFF3A9A3A)];
+
+  /// [q] in 0…1 (clamped) on [quality], interpolated between stops.
+  Color qualityOf(double q) {
+    final s = quality;
+    final t = q.clamp(0.0, 1.0) * (s.length - 1);
+    final i = math.min(s.length - 2, t.floor());
+    return Color.lerp(s[i], s[i + 1], t - i)!;
+  }
+
+  /// How strong a chart line's glow is: present by night, a hint by day.
+  double get glow => dark ? .5 : .22;
+
   /// The ink that goes on top of a [fill]. White by construction — [fill]
   /// darkens the accent until white clears AA on it.
   Color get inkOnFill => C.white;
@@ -348,6 +368,14 @@ class F {
       fontWeight: FontWeight.w600,
       letterSpacing: -7.5,
       fontFeatures: _tab);
+  /// The Pulso hero for a WORD rather than a number ("Mejorando").
+  static const heroWord = TextStyle(
+      fontFamily: '.SF Pro Display',
+      fontFamilyFallback: _fb,
+      fontSize: 52,
+      height: 1,
+      fontWeight: FontWeight.w600,
+      letterSpacing: -2.4);
   static const n48 = TextStyle(
       fontFamily: _f,
       fontFamilyFallback: _fb,
@@ -431,6 +459,16 @@ class Motion {
       MediaQuery.maybeDisableAnimationsOf(c) != true;
 
   static const fast = Duration(milliseconds: 120);
+
+  /// A Pulso chart line drawing itself in, then one light passing along it.
+  /// Played once (no loop), and zero under reduced motion via [motion].
+  static const chartDraw = Duration(milliseconds: 2200);
+
+  /// Reseteo: 60 s of 4 s in / 6 s out, the band buzzing each phase. The
+  /// circle's grow/shrink takes the phase's own length (through [motion]).
+  static const resetIn = Duration(seconds: 4);
+  static const resetOut = Duration(seconds: 6);
+  static const resetLength = Duration(seconds: 60);
   static const base = Duration(milliseconds: 180);
   static const slow = Duration(milliseconds: 280);
 

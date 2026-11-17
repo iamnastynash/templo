@@ -80,6 +80,7 @@ import 'detected_activities.dart';
 import 'day_timeline.dart' show DayTimelineScreen;
 import 'metric_detail.dart';
 import 'readiness_detail.dart';
+import 'pulso_day.dart' show PulsoTodayCard;
 import 'sleep_detail.dart';
 
 // ═══════════════════ shared plumbing ═══════════════════
@@ -2692,6 +2693,9 @@ class _HomeScreenState extends State<HomeScreen> with RevisionReload {
         const SizedBox(height: S.x3),
         const DetectedActivitiesCard(),
         const CommunityNudge(),
+        // PULSO: energy, the load split and the consejo — today only. Below
+        // the cards the guides anchor on, so their positions do not move.
+        if (isToday) ...[const SizedBox(height: S.x3), const PulsoTodayCard()],
 
         // ── the rollup was withheld, not absent ──
         if (stale != null) ...[const SizedBox(height: S.x3), stale],

@@ -96,6 +96,8 @@ class ImportSummary extends MapView<String, int> {
 /// backed-up key missing here is written as-is; the guard test keeps this
 /// table complete. Keys in [kPrefsNotBackedUp] need no entry.
 const Map<String, String> kPrefTypes = {
+  'pulso.focus.v1': 'string',
+  'pulso.resets.v1': 'string',
   'activity.nap_auto_log_since_sec': 'int',
   'ai.journal_done_day': 'string',
   'ai_evening_enabled': 'bool',

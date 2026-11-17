@@ -11,7 +11,7 @@ import 'package:openstrap_edge/ui2/guides/guide_target.dart'; import 'package:op
 final Map<String, WidgetBuilder> kGuideDemoScreens = {
   // Home inside the tab bar, as on the phone: the bar is chrome and stays legible.
   'open-strain': (_) => AppShell( builder: (context, domain) => switch (domain) { ShellDomain.today => HomeScreen(data: GuideDemo.home, hour: 9, workoutLive: false),
-          ShellDomain.sleep || ShellDomain.activity || ShellDomain.health => const SizedBox.shrink(), }, ),
+          ShellDomain.sleep || ShellDomain.activity || ShellDomain.focus || ShellDomain.health => const SizedBox.shrink(), }, ),
   'open-zones': (_) => DayStrainDetail(data: GuideDemo.dayStrain), 'set-own-zones': (_) => ZonesDetail(data: GuideDemo.zones), };
 /// The demo screen of [step]; a step with none registered is a test bug, so it
 /// fails loudly instead of rendering nothing.

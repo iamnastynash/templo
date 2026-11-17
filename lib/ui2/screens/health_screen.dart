@@ -33,6 +33,8 @@ import 'findings_log.dart';
 import 'slot_scrub.dart';
 import 'home_screen.dart';
 import 'investigate.dart';
+import 'pulso_health.dart';
+import 'pulso_day.dart' show BodyAgeScreen, kBodyAgeIcon;
 import 'metric_detail.dart';
 import 'wellness_screen.dart';
 
@@ -905,6 +907,24 @@ class _HealthScreenState extends State<HealthScreen> with RevisionReload {
             style: F.cap.copyWith(color: p.ink3)),
         const SizedBox(height: S.x2),
       ],
+      // PULSO: the two slow-moving views lead the tab.
+      Section(
+        'Pulso',
+        Column(children: [
+          detailLinkRow(c, LucideIcons.heartPulse, 'Salud cardiovascular',
+              '5 componentes · últimas 14 noches',
+              () => go(c, const CardioScreen())),
+          const SizedBox(height: S.x2),
+          detailLinkRow(c, LucideIcons.trendingUp, 'Tendencia',
+              'Pulso, HRV y sueño · 8 semanas',
+              () => go(c, const TrendScreen())),
+          const SizedBox(height: S.x2),
+          detailLinkRow(c, kBodyAgeIcon, 'Edad del cuerpo',
+              'Según tus hábitos · últimas 4 semanas',
+              () => go(c, const BodyAgeScreen())),
+        ]),
+      ),
+      const SizedBox(height: S.x4),
       if (rows.isNotEmpty)
         Surface(
           pad: const EdgeInsets.symmetric(horizontal: S.x4),
