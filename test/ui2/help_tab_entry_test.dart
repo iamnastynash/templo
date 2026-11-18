@@ -7,7 +7,7 @@ import 'package:openstrap_edge/ui2/guides/help_screen.dart';
 import 'package:openstrap_edge/ui2/guides/help_entry.dart';
 import '../support/skeleton_fixture.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import '../support/guide_r2_scenes.dart' show r2OpenDb, r2Tab;
+import '../support/guide_r2_scenes.dart' show r2OpenDb, r2OpenTab;
 import '../support/live_guide_harness.dart';
 
 const _ids = {
@@ -30,8 +30,7 @@ void main() {
       final semantics = t.ensureSemantics();
       try {
         await pumpLiveGuideApp(t, brightness: Brightness.dark);
-        await t.tap(r2Tab(topic.index));
-        await settleLiveGuide(t);
+        await r2OpenTab(t, topic.index);
         for (
           var i = 0;
           i < 30 && t.any(find.byType(CircularProgressIndicator));

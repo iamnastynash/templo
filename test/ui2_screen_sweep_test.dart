@@ -11,6 +11,8 @@
 // swept from then on; each takes its own preloaded data, so nothing touches
 // the database.
 
+import 'support/bundled_fonts.dart' show loadFonts;
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -28,6 +30,7 @@ import 'package:openstrap_edge/ui2/screens/screens.dart';
 import 'package:openstrap_edge/ui2/ui2.dart';
 
 Future<void> _loadType() async {
+  await loadFonts();
   final files = Directory('assets/fonts/Manrope')
       .listSync()
       .whereType<File>()

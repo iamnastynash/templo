@@ -2428,7 +2428,7 @@ class _HomeScreenState extends State<HomeScreen> with RevisionReload {
       final paired = c.select<AppState?, bool>((a) => a?.isPaired ?? false);
       final status = _phaseStatusCard(c, l, compact: true);
       return _refreshable(ListView(padding: pad, children: [
-        if (dbRebuiltCard(dbRebuildOf(c), l) case final rebuilt?) rebuilt,
+        ?dbRebuiltCard(dbRebuildOf(c), l),
         if (d != null) ...?_bodyWatch(c, d, todayLabel(widget.now)),
         TemploToday(
           date: prettyDay(todayLabel(widget.now), l),
@@ -2448,6 +2448,9 @@ class _HomeScreenState extends State<HomeScreen> with RevisionReload {
           onHistory: () => go(c, Scaffold(appBar: AppBar(), body: const HomeScreen())),
           onActivity: openActivity,
         ),
+        if (d != null) _briefingDoor(c, d),
+        coachChip(c),
+        const HelpEntry(topic: GuideTopic.today),
       ]));
     }
     final g = _greeting(widget.hour ?? DateTime.now().hour, l);

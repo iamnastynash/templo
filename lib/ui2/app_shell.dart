@@ -72,7 +72,10 @@ class AppShell extends StatefulWidget {
   /// position included — alive in the [IndexedStack].
   final ValueNotifier<ShellDomain>? selection;
 
+  final bool showGuideActivity;
+
   const AppShell({
+    this.showGuideActivity = false,
     super.key,
     required this.builder,
     this.initial = ShellDomain.today,
@@ -204,7 +207,11 @@ class _AppShellState extends State<AppShell> {
             ],
           ),
         ),
-        bottomNavigationBar: _TabBar(current: _current, onTap: _select),
+        bottomNavigationBar: _TabBar(
+          current: _current,
+          onTap: _select,
+          showActivity: widget.showGuideActivity,
+        ),
       ),
     );
   }
@@ -214,7 +221,9 @@ class _TabBar extends StatelessWidget {
   final ShellDomain current;
   final ValueChanged<ShellDomain> onTap;
 
-  const _TabBar({required this.current, required this.onTap});
+  final bool showActivity;
+
+  const _TabBar({required this.current, required this.onTap, required this.showActivity});
 
   @override
   Widget build(BuildContext c) {
@@ -227,13 +236,13 @@ class _TabBar extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: p.dark ? const Color(0xFF2C2C2C) : C.carbon,
+            color: p.dark ? C.dockDark : C.carbon,
             borderRadius: R.rPill,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              for (final d in const [
+              for (final d in showActivity ? ShellDomain.values : const [
                 ShellDomain.today,
                 ShellDomain.sleep,
                 ShellDomain.focus,
@@ -242,6 +251,7 @@ class _TabBar extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: _Tab(
+                    key: ValueKey(d),
                     domain: d,
                     on: d == current,
                     onTap: () => onTap(d),
@@ -260,7 +270,7 @@ class _Tab extends StatelessWidget {
   final bool on;
   final VoidCallback onTap;
 
-  const _Tab({required this.domain, required this.on, required this.onTap});
+  const _Tab({super.key, required this.domain, required this.on, required this.onTap});
 
   @override
   Widget build(BuildContext c) {
@@ -274,7 +284,8 @@ class _Tab extends StatelessWidget {
         '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3"/>',
       ShellDomain.health =>
         '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
-      ShellDomain.activity => '',
+      ShellDomain.activity =>
+        '<path d="M3 12h4l3-6 4 12 3-6h4"/>',
     };
     return Semantics(
       selected: on,
@@ -301,7 +312,7 @@ class _Tab extends StatelessWidget {
               height: 18,
               excludeFromSemantics: true,
               colorFilter: ColorFilter.mode(
-                on ? p.onHi : const Color(0xFFADADA7),
+                on ? p.onHi : C.dockInactive,
                 BlendMode.srcIn,
               ),
             ),

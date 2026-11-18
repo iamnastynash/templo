@@ -36,8 +36,9 @@ class TodayLayout {
       final tile = TodayTile.values
           .where((t) => t.name == parts.first)
           .firstOrNull;
-      if (tile != null && seen.add(tile))
+      if (tile != null && seen.add(tile)) {
         result.add((tile: tile, visible: parts.last == '1'));
+      }
     }
     return [...result, ...defaults.where((s) => !seen.contains(s.tile))];
   }

@@ -98,6 +98,8 @@ class ImportSummary extends MapView<String, int> {
 const Map<String, String> kPrefTypes = {
   'pulso.focus.v1': 'string',
   'pulso.resets.v1': 'string',
+  'templo.today_layout.v1': 'string',
+  'templo.oxygen.v1': 'string',
   'activity.nap_auto_log_since_sec': 'int',
   'ai.journal_done_day': 'string',
   'ai_evening_enabled': 'bool',

@@ -10,6 +10,8 @@
 // The second is the honesty contract: absent when the content fits, present
 // when it does not, gone at the end of the scroll.
 
+import 'support/bundled_fonts.dart' show loadFonts;
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -22,6 +24,7 @@ import 'package:openstrap_edge/ui2/ui2.dart';
 /// glyphs, and a width assertion against the wrong font is a width assertion
 /// against nothing.
 Future<void> _loadType() async {
+  await loadFonts();
   final files = Directory('assets/fonts/Manrope')
       .listSync()
       .whereType<File>()

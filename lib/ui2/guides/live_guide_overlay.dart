@@ -947,7 +947,18 @@ class LiveGuideOverlayState extends State<LiveGuideOverlay> with TickerProviderS
     final plan = planSkeleton(page, keep: keepers, chrome: [?tabBar],
         dim: DimPolicy(focus: back, placeholders: false, neighboursLit: !chromeRoute, navigationTarget: backIsTab, focusObject: backElement == null ? null : laidOutBox(backElement)));
     final veil = scaffoldOf(page).withValues(alpha: kDimOpacity);
-    final out = <SkeletonShape>[...plan.shapes];
+    final bodyBounds = Rect.fromLTRB(0, 0, root.size.width,
+        tabBar?.top ?? root.size.height);
+    final out = <SkeletonShape>[
+      for (final shape in plan.shapes)
+        if (shape.rect.overlaps(bodyBounds))
+          SkeletonShape(
+            kind: shape.kind,
+            rect: shape.rect.intersect(bodyBounds),
+            color: shape.color,
+            section: shape.section,
+          ),
+    ];
     final units = <PlannedUnit>[...plan.units];
     var section = plan.shapes.isEmpty ? 0 : plan.shapes.last.section + 1;
     for (var i = 0; i < tabs.length; i++) {

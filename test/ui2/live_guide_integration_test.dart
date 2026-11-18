@@ -126,7 +126,7 @@ void main() { setUpAll(() async { sqfliteFfiInit(); databaseFactory = databaseFa
     testWidgets('wrong navigation (another tab) shows "You\'ve left the path"; "Back to the guide" returns to Today and step 1', (t) async {
       // why: spec off-path card. Switching tabs is the commonest way to leave; the tab bar is chrome, so the tap passes through.
       final app = await pumpLiveGuideApp(t); await _startFromHelp(t, app, 'heart-rate-zones'); final l = _l(t);
-      await t.tap(_label(l.tabHealth).last); await _reveal(t); expect(find.byType(HealthScreen), findsOneWidget);
+      await t.tap(find.byTooltip(l.tabHealth)); await _reveal(t); expect(find.byType(HealthScreen), findsOneWidget);
       expect(_run(app).state, isA<GuideOffPath>()); expect(find.byKey(GuideStepCard.offPathKey), findsOneWidget); expect(find.text(l.guideOffPathTitle), findsOneWidget);
       await t.tap(find.byKey(GuideStepCard.backToGuideKey)); await _reveal(t); expect(find.byType(HomeScreen), findsOneWidget);
       expect(_step(app), 0); expect(find.byKey(GuideStepCard.offPathKey), findsNothing); });
@@ -157,7 +157,7 @@ void main() { setUpAll(() async { sqfliteFfiInit(); databaseFactory = databaseFa
         await settleMovingGuide(t);
         final l = lookupAppLocalizations(locale); expect(t.takeException(), isNull); expect(_caption(t), _plain(l.guideHrZonesStep1(l.tabToday, l.homeRingStrain)));
         final card = t.getRect(find.byKey(GuideStepCard.cardKey)); expect(card.overlaps(t.getRect(liveGuideFocus)), isFalse, reason: 'card=$card focus=${t.getRect(liveGuideFocus)} target=${t.state<LiveGuideOverlayState>(find.byType(LiveGuideOverlay)).targetRect} hand=${t.state<LiveGuideOverlayState>(find.byType(LiveGuideOverlay)).handTargets.map((e) => e.rect).toList()}');
-        expect(card.overlaps(t.getRect(find.byKey(LiveGuideOverlay.tapPillKey))), isFalse); final tabBar = t.getRect(_label(l.tabToday).last);
+        expect(card.overlaps(t.getRect(find.byKey(LiveGuideOverlay.tapPillKey))), isFalse); final tabBar = t.getRect(find.byTooltip(l.tabToday));
         expect(card.bottom, lessThanOrEqualTo(tabBar.top + 1), reason: 'the bottom card sits above the tab bar'); }); } }); group('guide #7 start a workout', () {
     testWidgets('start from Help selects the Activity tab; tapping the real "start a session" card opens the real picker and the run advances', (t) async {
       // why: a second guide, another tab, a pushed route that is not a detail screen.

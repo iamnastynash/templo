@@ -116,12 +116,16 @@ class PulsoStore extends ChangeNotifier {
   }) {
     final index = session.trades.indexOf(trade);
     if (index < 0 || (trade.end == null) != (end == null) ||
-        (result != null && result != 'win' && result != 'loss')) return false;
+        (result != null && result != 'win' && result != 'loss')) {
+      return false;
+    }
     final earliest = index == 0 ? session.start : session.trades[index - 1].end;
     final latest = index + 1 == session.trades.length
         ? session.end ?? now : session.trades[index + 1].start;
     if (earliest == null || start < earliest || start > latest ||
-        (end != null && (end < start || end > latest))) return false;
+        (end != null && (end < start || end > latest))) {
+      return false;
+    }
 
     session.trades[index] = Trade(
       start, end: end, result: result,

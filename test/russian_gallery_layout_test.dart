@@ -1,3 +1,5 @@
+import 'support/bundled_fonts.dart' show loadFonts;
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ void main() {
     final fonts = Directory(
       'assets/fonts/Manrope',
     ).listSync().whereType<File>().where((f) => f.path.endsWith('.ttf'));
+    await loadFonts();
     for (final family in ['Manrope', '.SF Pro Text']) {
       final loader = FontLoader(family);
       for (final file in fonts) {

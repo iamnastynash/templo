@@ -58,7 +58,7 @@ GuideUnitLook? _look(Element e) => GuideDimScope.controllerOf(e)?.looks?.lookOf(
     for (final scene in _pageScenes) { testWidgets('R5-4c ${scene.id}: the back arrow is usable in every frame of the page\'s arrival', (t) async {
         final repo = GuideFakeRepo(singlePending: false); final app = await pumpLiveGuideApp(t, size: r2Size, repo: repo); final guide = r2Guide(scene.guide);
         final run = GuideRun(guide: guide, variant: (guide.variantFor(null) as GuideVariantFound).variant); try {
-          await t.tap(r2Tab(ShellDomain.values.byName(guide.start.name).index)); await settleLiveGuide(t); final entry = OverlayEntry(builder: (_) => LiveGuideOverlay(run: run,
+          await r2OpenTab(t, ShellDomain.values.byName(guide.start.name).index); final entry = OverlayEntry(builder: (_) => LiveGuideOverlay(run: run,
             navigatorKey: app.navigatorKey, routes: app.runner.routes, onExit: run.exit, onBackToGuide: () {}));
           app.navigator.overlay!.insert(entry); addTearDown(() { if (entry.mounted) entry.remove(); }); await t.pump();
           final page = scene.guide == 'remove-detected' ? DetectedActivitiesScreen(preloaded: await repo.pendingActivities())

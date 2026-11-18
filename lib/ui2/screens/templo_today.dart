@@ -56,7 +56,7 @@ class TemploToday extends StatelessWidget {
                 ),
                 Text(
                   recovery?.toStringAsFixed(0) ?? '—',
-                  style: F.hero.copyWith(color: p.ink, fontSize: 96, height: 1),
+                  style: F.todayHero.copyWith(color: p.ink),
                 ),
                 if (recovery == null)
                   Text(
@@ -125,7 +125,7 @@ class TemploToday extends StatelessWidget {
             ),
           ],
         ),
-        if (status != null) status!,
+        ?status,
         const SizedBox(height: S.x3),
         ValueListenableBuilder(
           valueListenable: TodayLayout.value,

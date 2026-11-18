@@ -21,7 +21,7 @@ class _M0Shell { final nav = GlobalKey<NavigatorState>(); final routes = GuideRo
     t.view.devicePixelRatio = 1; addTearDown(t.view.reset); await t.pumpWidget(GuideDimScope(controller: dim, child: MaterialApp(
       navigatorKey: nav, navigatorObservers: [routes], scrollBehavior: const GuideScrollBehavior(),
       theme: buildTheme(Brightness.light), localizationsDelegates: AppLocalizations.localizationsDelegates, supportedLocales: AppLocalizations.supportedLocales,
-      home: AppShell(initial: ShellDomain.activity, builder: (context, domain) => switch (domain) { ShellDomain.activity => Column(children: [
+      home: AppShell(showGuideActivity: true, initial: ShellDomain.activity, builder: (context, domain) => switch (domain) { ShellDomain.activity => Column(children: [
           const Padding(padding: EdgeInsets.all(16), child: Text('Shell anchor line', key: _m0Anchor)),
           Pressable(key: _m0Control, onTap: () => controlTaps++, child: const Surface(child: Text('A control'))), ]),
         ShellDomain.health => Column(children: [Pressable(key: _m0OnHealth, onTap: () {}, child: const Text('Only on Health'))]),

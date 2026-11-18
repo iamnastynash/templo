@@ -12,6 +12,8 @@
 //   3. No screen renders a bare em-dash. Absence is a StatusCard, and the
 //      widget tests sweep for the dash directly.
 
+import 'support/bundled_fonts.dart' show loadFonts;
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -121,6 +123,7 @@ Widget _frame(Widget child, Brightness b, double scale) => MediaQuery(
     );
 
 Future<void> _loadType() async {
+  await loadFonts();
   final files = Directory('assets/fonts/Manrope')
       .listSync()
       .whereType<File>()

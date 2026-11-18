@@ -99,7 +99,7 @@ class _SessionSwipeActionsState extends State<SessionSwipeActions> {
                           'Eliminar',
                           LucideIcons.trash2,
                           C.carbon,
-                          Colors.white,
+                          C.dockInactive,
                           () async {
                             await deleteFocusSession(context, widget.session);
                             if (mounted) _settle(false);

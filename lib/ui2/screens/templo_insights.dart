@@ -50,8 +50,9 @@ class _TemploQuickJournalState extends State<TemploQuickJournal> {
   Future<({List<Map<String, dynamic>> journal, Map<String, double> sleep})>
   _load() async {
     final repo = repoOf(context);
-    if (repo == null)
+    if (repo == null) {
       return (journal: <Map<String, dynamic>>[], sleep: <String, double>{});
+    }
     return (
       journal: await repo.getJournal(range: '90d'),
       sleep: await _dailySeries(repo, 'sleep'),
@@ -80,10 +81,11 @@ class _TemploQuickJournalState extends State<TemploQuickJournal> {
         tags.toList(),
         today?['note'] as String? ?? '',
       );
-      if (mounted)
+      if (mounted) {
         setState(() {
           _data = _load();
         });
+      }
     } catch (_) {
       if (mounted) setState(() => _error = 'No se pudo guardar la etiqueta.');
     } finally {
@@ -95,10 +97,11 @@ class _TemploQuickJournalState extends State<TemploQuickJournal> {
     await Navigator.of(
       context,
     ).push(MaterialPageRoute<bool>(builder: (_) => JournalCompose(date: date)));
-    if (mounted)
+    if (mounted) {
       setState(() {
         _data = _load();
       });
+    }
   }
 
   Future<void> _pickEntry() async {
@@ -121,8 +124,9 @@ class _TemploQuickJournalState extends State<TemploQuickJournal> {
       FutureBuilder(
         future: _data,
         builder: (context, snapshot) {
-          if (snapshot.hasError)
+          if (snapshot.hasError) {
             return const Text('No se pudo leer tu diario.');
+          }
           final data = snapshot.data;
           if (data == null) return const LinearProgressIndicator();
           final today = todayLabel();
@@ -325,10 +329,12 @@ class _TemploNightState extends State<TemploNight> {
     FutureBuilder<_NightResult?>(
       future: _summary,
       builder: (context, snapshot) {
-        if (snapshot.hasError)
+        if (snapshot.hasError) {
           return const Text('No se pudieron leer tus noches.');
-        if (snapshot.connectionState != ConnectionState.done)
+        }
+        if (snapshot.connectionState != ConnectionState.done) {
           return const LinearProgressIndicator();
+        }
         final data = snapshot.data;
         if (data == null || data.metrics.isEmpty) {
           return const Text(
@@ -427,14 +433,16 @@ class _TemploRoutePulseState extends State<TemploRoutePulse> {
     FutureBuilder<List<_RoutePick>>(
       future: _routes,
       builder: (context, snapshot) {
-        if (snapshot.hasError)
+        if (snapshot.hasError) {
           return const Text('No se pudieron leer las rutas.');
+        }
         final routes = snapshot.data;
         if (routes == null) return const LinearProgressIndicator();
-        if (routes.length < 2)
+        if (routes.length < 2) {
           return const Text(
             'Se necesitan dos carreras guardadas con GPS y pulso.',
           );
+        }
         final a = _a ?? routes.first.id;
         final b = _b ?? routes.firstWhere((route) => route.id != a).id;
         final current = routes.firstWhere((route) => route.id == a).route;

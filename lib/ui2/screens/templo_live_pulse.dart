@@ -28,7 +28,7 @@ class _TemploLivePulseState extends State<TemploLivePulse> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final visible =
-        TickerMode.of(context) && (ModalRoute.isCurrentOf(context) ?? true);
+        TickerMode.valuesOf(context).enabled && (ModalRoute.isCurrentOf(context) ?? true);
     final app = visible ? context.read<AppState?>() : null;
     if (identical(app, _owner)) return;
     _stop();

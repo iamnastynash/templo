@@ -485,14 +485,17 @@ class CoachFigure extends StatelessWidget {
     final inks = [C.blue, C.orange, C.teal, C.purple, C.green];
     final grid = LayoutBuilder(
       builder: (_, box) {
-        final w = (box.maxWidth - S.x3) / 2;
+        final wideText = MediaQuery.textScalerOf(c).scale(16) >= 40;
+        final w = wideText || cards.length == 1
+            ? box.maxWidth
+            : (box.maxWidth - S.x3) / 2;
         return Wrap(
           spacing: S.x3,
           runSpacing: S.x3,
           children: [
             for (var i = 0; i < cards.length; i++)
               SizedBox(
-                width: cards.length == 1 ? box.maxWidth : w,
+                width: w,
                 child: SignalCard(
                   LucideIcons.activity,
                   inks[i % inks.length],

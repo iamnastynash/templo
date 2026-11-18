@@ -35,6 +35,7 @@ const _mustTravel = {
   'notif_relay_enabled', 'notif_relay_packages',
   'ui.shell_tab.v2', 'ui.recap_range', 'ui.workouts_range',
   'pulso.focus.v1', 'pulso.resets.v1',
+  'templo.today_layout.v1', 'templo.oxygen.v1',
   'ui.wearable_show_estimates', 'ui.wearable_side_by_side',
   'sleep_hmm_stages',
   'rough_night.ask', 'rough_night.dismissed',

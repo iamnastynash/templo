@@ -27,8 +27,9 @@ double? decodePulseOximetry(List<int> data, {required bool continuous}) {
       offset +
           (hasStatus ? 2 : 0) +
           (hasSensor ? 3 : 0) +
-          (hasAmplitude ? 2 : 0))
+          (hasAmplitude ? 2 : 0)) {
     return null;
+  }
   if (hasStatus) {
     if ((word(offset) & 0xfe60) != 0) return null;
     offset += 2;
@@ -49,8 +50,9 @@ Future<double> readPulseOximeter(BluetoothDevice device) async {
   StreamSubscription<List<int>>? subscription;
   BluetoothCharacteristic? enabled;
   try {
-    if (!wasConnected)
+    if (!wasConnected) {
       await device.connect(timeout: const Duration(seconds: 12));
+    }
     final services = await device.discoverServices(timeout: 12);
     final chars = [
       for (final service in services)

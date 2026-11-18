@@ -1,6 +1,8 @@
 // Widget tests for Home, Health and the shared drill-down: units, dated
 // percentiles, and that an absent value is never a bare em-dash.
 
+import 'support/bundled_fonts.dart' show loadFonts;
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -229,6 +231,7 @@ Future<void> _loadType() async {
   final files = Directory(
     'assets/fonts/Manrope',
   ).listSync().whereType<File>().where((f) => f.path.endsWith('.ttf'));
+  await loadFonts();
   for (final family in const ['Manrope', '.SF Pro Text', 'Menlo']) {
     final loader = FontLoader(family);
     for (final f in files) {

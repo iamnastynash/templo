@@ -63,7 +63,7 @@ final _rules = <_Rule>[
     'ungated Duration(',
     // `motion(context, …)` is the gate. Motion.fast/base/slow are the token
     // constants it is fed.
-    RegExp(r'Duration\((?!\s*\))'),
+    RegExp(r'\bDuration\((?!\s*\))'),
     'Durations come from Motion.fast/base/slow and pass through '
         'motion(context, …) so reduced motion collapses them to zero.',
     // home_screen's `_tapGrace` is a `Timer` bridging a tap to the first
@@ -71,7 +71,15 @@ final _rules = <_Rule>[
     // long a network round trip gets before the button gives up on it, and
     // `Timer` has no non-`Duration` constructor to dodge this the way
     // beats.dart's wall-clock math does.
-    allow: {_tokenFile, 'lib/ui2/screens/home_screen.dart'},
+    allow: {
+      _tokenFile,
+      'lib/ui2/screens/home_screen.dart',
+      // Calendar window, sample refresh, BLE deadlines, and trade timestamps.
+      'lib/ui2/screens/templo_focus_review.dart',
+      'lib/ui2/screens/templo_live_pulse.dart',
+      'lib/ui2/screens/templo_oxygen.dart',
+      'lib/ui2/screens/templo_trade_editor.dart',
+    },
   ),
   _Rule(
     'raw gesture detector',
@@ -83,7 +91,10 @@ final _rules = <_Rule>[
     'Pressable is the only gesture primitive and Scrubber the only drag — they '
         'are what apply the 44 pt minimum and the slider semantics, so a call '
         'site that bypasses them is a call site that opts out of them.',
-    allow: {_gestureFile, 'lib/ui2/guides/live_guide_overlay.dart', 'lib/ui2/skeleton/skeleton.dart'},
+    allow: {_gestureFile, 'lib/ui2/guides/live_guide_overlay.dart', 'lib/ui2/skeleton/skeleton.dart',
+      // Swipe is supplementary to the actions on the session details page.
+      'lib/ui2/screens/templo_session_editor.dart',
+    },
   ),
 ];
 
@@ -192,6 +203,11 @@ void main() {
 /// this list fails the test above, so the choice has to be made rather than
 /// drifted into.
 const _notComponents = {
+  // Templo routes and their data-backed sections use app stores and navigation.
+  'TemploSessionReview', 'TemploSessionComparisons', 'TemploQuickJournal',
+  'TemploNight', 'TemploRoutePulse', 'TemploTodayLayout', 'TemploToday',
+  'TemploLivePulse', 'SessionSwipeActions', 'TemploHealth', 'TradeActions',
+  'TemploOxygen',
   // Pulso screens: they read the repository.
   'CardioScreen',
   'TrendScreen',

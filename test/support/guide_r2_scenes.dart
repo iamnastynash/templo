@@ -7,13 +7,30 @@ import 'package:openstrap_edge/ui2/activity/setup.dart'; import 'package:openstr
 import 'package:openstrap_edge/ui2/guides/guide.dart'; import 'package:openstrap_edge/ui2/guides/guide_catalogue.dart';
 import 'package:openstrap_edge/ui2/guides/guide_run.dart'; import 'package:openstrap_edge/ui2/guides/guide_runner.dart';
 import 'package:openstrap_edge/ui2/guides/guide_target.dart'; import 'package:openstrap_edge/ui2/guides/live_guide_overlay.dart';
+import 'package:openstrap_edge/ui2/app_shell.dart';
 import 'package:openstrap_edge/ui2/profile/alarm.dart'; import 'package:openstrap_edge/ui2/screens/detected_activities.dart';
 import 'package:openstrap_edge/ui2/screens/log_workout.dart'; import 'package:openstrap_edge/ui2/screens/naps.dart';
 import 'package:path/path.dart' as p; import 'package:sqflite_common_ffi/sqflite_ffi.dart'; import 'live_guide_harness.dart';
 const r2Size = Size(412, 915); final r2Locale = lookupAppLocalizations(const Locale('en')); Guide r2Guide(String id) => kGuideCatalogue.firstWhere((e) => e.guide.id == id).guide;
 Finder r2Tabs({bool hidden = false}) => find.byWidgetPredicate( (w) => w.runtimeType.toString() == '_TabBar', skipOffstage: !hidden);
-Finder r2Tab(int index, {bool hidden = false}) => find.descendant( of: r2Tabs(hidden: hidden), matching: find.byWidgetPredicate(
-    (w) => w.runtimeType.toString() == '_Tab', skipOffstage: !hidden), skipOffstage: !hidden).at(index);
+Finder r2Tab(int index, {bool hidden = false}) => find.byKey(
+  ValueKey(ShellDomain.values[index]),
+  skipOffstage: !hidden,
+);
+
+Future<void> r2OpenTab(WidgetTester tester, int index) async {
+  final tab = r2Tab(index);
+  if (index == 2 && !tester.any(tab)) {
+    await tester.tap(r2Tab(0));
+    await settleLiveGuide(tester);
+    await tester.tap(find.byTooltip('Today options'));
+    await settleLiveGuide(tester);
+    await tester.tap(find.text(r2Locale.tabActivity));
+  } else {
+    await tester.tap(tab);
+  }
+  await settleLiveGuide(tester);
+}
 class R2Scene { final String guide, step; final Widget Function()? page; final bool history, staged, manual;
   const R2Scene(this.guide, this.step, {this.page, this.history = false, this.staged = false, this.manual = false});
   String get id => '$guide/$step'; bool get shell => page == null; } final r2Scenes = <R2Scene>[ const R2Scene('heart-rate-zones', 'open-strain'),
@@ -52,7 +69,7 @@ Future<R2Mounted> pumpR2Scene(WidgetTester t, R2Scene scene, {Size size = r2Size
       await t.tap(find.text(r2Locale.workoutTabHistory)); } final mounted = R2Mounted(app, run, null);
     addTearDown(() { mounted.removeOverlay(); run.dispose(); }); return mounted; }
   final index = [GuideStart.today, GuideStart.sleep, GuideStart.activity, GuideStart.health, GuideStart.settings].indexOf(guide.start);
-  await t.tap(r2Tab(index)); await settleLiveGuide(t); if (scene.page != null) {
+  await r2OpenTab(t, index); if (scene.page != null) {
     // Pin the review's pending data at entry: unrelated remembered moment follow-ups must not select another day in this activity-only fixture.
     final page = scene.guide == 'remove-detected' ? DetectedActivitiesScreen(preloaded: await repo.pendingActivities()) : scene.page!();
     app.navigator.push(MaterialPageRoute<void>(builder: (_) => page)); await settleLiveGuide(t); }

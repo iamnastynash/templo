@@ -34,6 +34,7 @@ import 'ui2/screens/ai_briefing.dart';
 import 'ui2/screens/calm_breathing.dart';
 import 'ui2/screens/what_changed.dart';
 import 'ui2/screens/templo_health.dart';
+import 'ui2/screens/health_screen.dart';
 import 'ui2/screens/pulso_focus.dart' show FocusTab;
 import 'ui2/screens/home_screen.dart';
 import 'ui2/screens/journal_compose.dart';
@@ -696,8 +697,12 @@ class _ShellState extends State<AppMainShell> implements GuideShellLink {
     // SELECT, not watch: a bool that flips twice a workout, not the ~1 Hz
     // AppState tick.
     final live = context.select<AppState, bool>((a) => a.activeWorkout != null);
+    final guiding = context.select<GuideRunner?, bool>(
+      (runner) => runner?.activeRun != null,
+    );
     return AppShell(
       initial: _domain,
+      showGuideActivity: guiding,
       selection: _selection,
       banner: live ? const _LiveSessionBar() : null,
       onSelect: (d) {
@@ -709,11 +714,15 @@ class _ShellState extends State<AppMainShell> implements GuideShellLink {
         _selection.value = d;
       },
       builder: (c, d) => switch (d) {
-        ShellDomain.today => HomeScreen(onOpenActivity: () => _go(ShellDomain.activity)),
-        ShellDomain.sleep => const SleepTab(overview: true),
+        ShellDomain.today => HomeScreen(
+          onOpenActivity: guiding ? null : () => _go(ShellDomain.activity),
+        ),
+        ShellDomain.sleep => SleepTab(overview: !guiding),
         ShellDomain.activity => const WorkoutScreen(),
         ShellDomain.focus => const FocusTab(),
-        ShellDomain.health => const TemploHealth(),
+        ShellDomain.health => guiding
+            ? const HealthScreen()
+            : const TemploHealth(),
       },
     );
   }

@@ -145,7 +145,7 @@ void main() { setUpAll(() async { TestWidgetsFlutterBinding.ensureInitialized();
       // why: the mock-up's step 1 has the bottom tabs. The screen must be the real AppShell around the real Home, and the overlay must not cover it.
       final l = lookupAppLocalizations(const Locale('en')); final step = _steps()[0];
       final root = await _pumpScreen(t, step, w: 390, h: 780); expect(find.byType(AppShell), findsOneWidget); expect(find.byType(HomeScreen), findsOneWidget);
-      final tabs = [for (final n in ['Today', 'Sleep', 'Activity', 'Health']) skLocalRect(t, find.text(n).last, find.byKey(_root))];
+      final tabs = [for (final n in ['Today', 'Sleep', 'Enfoque', 'Health']) skLocalRect(t, find.byTooltip(n), find.byKey(_root))];
       final plan = _plan(t, step, root, l); for (final r in tabs) { _expectUntouched(plan, r, 'tab label'); }
       final chrome = defaultSkeletonChrome(root); expect(chrome.any((c) => tabs.every((r) => skContains(c, r))), isTrue); expect(t.takeException(), isNull); }); });
   group('real frames: 390x780, app fonts, text scale 1.3 (item 8)', () { for (final locale in const [Locale('en'), Locale('de'), Locale('ru')]) {

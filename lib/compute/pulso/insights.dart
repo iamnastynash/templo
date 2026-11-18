@@ -134,8 +134,9 @@ GroupComparison compareGroups(Iterable<num> a, Iterable<num> b) {
     for (var i = 0; i < b.length; i++) {
       final y = b[i];
       if (used.contains(i) || !_samePace(x.split, y.split)) continue;
-      if (distance(x.start, y.start) > 160 || distance(x.end, y.end) > 160)
+      if (distance(x.start, y.start) > 160 || distance(x.end, y.end) > 160) {
         continue;
+      }
       final d = distance(x.mid, y.mid);
       if (d < best) {
         best = d;
@@ -156,8 +157,9 @@ GroupComparison compareGroups(Iterable<num> a, Iterable<num> b) {
     final i = remainingLate.indexWhere(
       (late) => _samePace(x.split, late.split),
     );
-    if (i >= 0)
+    if (i >= 0) {
       drift.add(remainingLate.removeAt(i).split.avgHr! - x.split.avgHr!);
+    }
   }
   return (
     matches: changes.length,

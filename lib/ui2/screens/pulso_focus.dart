@@ -469,7 +469,7 @@ class _FinishSessionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const flame = Color(0xFFFF7A25);
+    const flame = C.flame;
     return Pressable(
       onTap: onTap,
       semanticLabel: 'Terminar sesión',
@@ -480,7 +480,7 @@ class _FinishSessionButton extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFFFBC66), flame],
+            colors: [C.flameLight, flame],
           ),
           borderRadius: R.rPill,
           boxShadow: [
@@ -537,17 +537,7 @@ class _TradingPulseState extends State<_TradingPulse>
     _syncBeat();
   }
 
-  void _syncBeat() {
-    final bpm = widget.bpm;
-    if (bpm == null || MediaQuery.disableAnimationsOf(context)) {
-      _beat.reset();
-      return;
-    }
-    final period = Duration(milliseconds: (60000 / bpm.clamp(35, 200)).round());
-    if (_beat.isAnimating && _beat.duration == period) return;
-    _beat.duration = period;
-    _beat.repeat();
-  }
+  void _syncBeat() => Motion.syncHeartbeat(context, _beat, widget.bpm);
 
   @override
   void dispose() {

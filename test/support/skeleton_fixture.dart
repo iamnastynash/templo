@@ -2,6 +2,7 @@
 // Not a test file (no _test suffix). Geometry oracles here come from the
 // engine (RenderParagraph line boxes, RenderBox transforms), never from the
 // code under test.
+import 'bundled_fonts.dart' show loadFonts;
 import 'dart:convert' show jsonDecode; import 'dart:io'; import 'dart:isolate'; import 'dart:typed_data';
 import 'package:flutter/material.dart'; import 'package:flutter/services.dart' show FontLoader; import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart'; import 'package:openstrap_edge/l10n/app_localizations.dart';
@@ -40,7 +41,9 @@ class SkPainter extends CustomPainter { const SkPainter(); @override void paint(
   bool shouldRepaint(covariant CustomPainter old) => false; }
 /// Loads the app's real fonts (Manrope, as ui2_activity_test does) so frame
 /// tests measure real glyph widths, not Ahem. Call from setUpAll.
-Future<void> skLoadAppFonts() async { final files = Directory('assets/fonts/Manrope') .listSync() .whereType<File>()
+Future<void> skLoadAppFonts() async {
+  await loadFonts();
+  final files = Directory('assets/fonts/Manrope') .listSync() .whereType<File>()
       .where((f) => f.path.endsWith('.ttf')); for (final family in const ['Manrope', '.SF Pro Text']) { final loader = FontLoader(family);
     for (final f in files) { loader.addFont(f .readAsBytes() .then((b) => ByteData.sublistView(Uint8List.fromList(b)))); }
     await loader.load(); } await _skLoadIconFonts(); }

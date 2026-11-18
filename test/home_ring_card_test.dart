@@ -33,6 +33,8 @@
 //   home-update-note / home-update-note-icon
 //   home-note:gap:<kind>                    an absent ring's reason row
 
+import 'support/bundled_fonts.dart' show loadFonts;
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -581,6 +583,7 @@ void main() {
     // wording could fit into three lines of a 100 pt column. Measure with the
     // fonts the app ships.
     setUpAll(() async {
+      await loadFonts();
       final fonts = Directory('assets/fonts/Manrope')
           .listSync()
           .whereType<File>()

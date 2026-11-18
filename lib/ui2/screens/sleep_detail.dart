@@ -21,7 +21,6 @@ import 'package:openstrap_analytics/onehz.dart' as ana;
 import 'package:provider/provider.dart';
 
 import '../../compute/vendor_sleep.dart' show vendorStagesReported;
-import '../pulso_chart.dart' show GlowLine;
 import 'pulso_day.dart' show PulsoBar;
 import '../../data/day_label.dart';
 import '../../data/local_repository.dart';
@@ -33,6 +32,7 @@ import '../../state/prefs.dart';
 import '../../models/metric.dart';
 import '../profile/devices.dart' show DeviceFilter;
 import '../profile/profile.dart' show ProfileAvatar;
+import '../guides/help_entry.dart';
 import '../ui2.dart';
 import 'home_screen.dart';
 import 'investigate.dart';
@@ -970,8 +970,7 @@ class _SleepDetailState extends State<SleepDetail> with RevisionReload {
             alignment: AlignmentDirectional.centerStart,
             child: FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text(time, style: F.hero.copyWith(
-                  fontSize: 84, letterSpacing: -5, color: p.ink)),
+              child: Text(time, style: F.sleepHero.copyWith(color: p.ink)),
             ),
           ),
           const SizedBox(height: S.x3),
@@ -1022,6 +1021,7 @@ class _SleepDetailState extends State<SleepDetail> with RevisionReload {
               child: Text(es ? 'Detalle, plan y alarma' : 'Details, plan and alarm'),
             ),
           ),
+          const HelpEntry(topic: GuideTopic.sleep),
         ],
       ),
     );

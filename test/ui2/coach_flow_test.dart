@@ -217,7 +217,10 @@ void main() {
       );
       await Prefs.reload();
       final semantics = t.ensureSemantics();
-      await t.tap(find.byType(ProfileAvatar));
+      await t.tap(find.byTooltip('Health'));
+      await settleLiveGuide(t);
+      await _reveal(t, find.text('Profile and settings'));
+      await t.tap(find.text('Profile and settings'));
       await settleLiveGuide(t);
       expect(find.byType(ProfileHome), findsOneWidget);
       await _reveal(t, _row('AI coach'));
@@ -246,6 +249,8 @@ void main() {
       expect(find.byType(ProfileHome), findsOneWidget);
       expect(find.text('test-coach'), findsOneWidget);
       app.navigator.pop();
+      await settleLiveGuide(t);
+      await t.tap(find.byTooltip('Today'));
       await settleLiveGuide(t);
       await _reveal(t, _press('Ask the coach'));
       final chip = t.getRect(_press('Ask the coach'));

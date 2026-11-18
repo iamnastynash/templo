@@ -1,6 +1,8 @@
 // Widget tests for onboarding and profile: the splash hands over once the
 // app is ready, and an absent value is a StatusCard, never a bare dash.
 
+import 'support/bundled_fonts.dart' show loadFonts;
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -160,6 +162,7 @@ Widget _frame(Widget child, Brightness b, double scale) => MediaQuery(
 /// The bundled type, so text measures as it does on a phone instead of as the
 /// harness's block glyphs.
 Future<void> _loadType() async {
+  await loadFonts();
   final files = Directory('assets/fonts/Manrope')
       .listSync()
       .whereType<File>()

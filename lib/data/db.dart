@@ -3086,7 +3086,7 @@ class LocalDb {
       where: 'rec_ts >= ? AND rec_ts <= ? '
           'AND hr IS NOT NULL AND ax IS NOT NULL AND ay IS NOT NULL AND az IS NOT NULL'
           '${deviceId == null ? '' : ' AND device_id = ?'}',
-      whereArgs: [sinceEpochSec, untilEpochSec, if (deviceId != null) deviceId],
+      whereArgs: [sinceEpochSec, untilEpochSec, ?deviceId],
       orderBy: 'rec_ts ASC',
     );
   }

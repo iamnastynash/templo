@@ -73,8 +73,9 @@ class _TemploOxygenState extends State<TemploOxygen> {
           TextButton(
             onPressed: () {
               final v = double.tryParse(input.replaceAll(',', '.'));
-              if (v != null && v.isFinite && v > 0 && v <= 100)
+              if (v != null && v.isFinite && v > 0 && v <= 100) {
                 Navigator.pop(ctx, v);
+              }
             },
             child: const Text('Guardar'),
           ),
@@ -141,11 +142,12 @@ class _TemploOxygenState extends State<TemploOxygen> {
       );
       setState(() => _message = null);
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(
           () => _message =
               'No llegó una lectura válida. Comprueba el Bluetooth y activa el oxímetro.',
         );
+      }
     } finally {
       if (mounted) setState(() => _working = false);
     }
@@ -184,8 +186,9 @@ class _TemploOxygenState extends State<TemploOxygen> {
                 'Este diagnóstico de señal no calcula saturación.';
       if (mounted) setState(() => _message = report);
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         setState(() => _message = 'No se pudieron leer las muestras ópticas.');
+      }
     } finally {
       if (mounted) setState(() => _working = false);
     }

@@ -40,6 +40,10 @@ class C {
   // white. Carbon and paper are the two grounds the light/dark themes sit on.
   static const coral = Color(0xFFFF6663);
   static const lime = Color(0xFFE0FF4F);
+  static const dockDark = Color(0xFF2C2C2C);
+  static const dockInactive = Color(0xFFADADA7);
+  static const flame = Color(0xFFFF7A25);
+  static const flameLight = Color(0xFFFFBC66);
   static const carbon = Color(0xFF191919);
   static const paper = Color(0xFFFEFFFE);
 
@@ -360,6 +364,9 @@ class F {
 
   /// The Pulso hero: one number per screen, set huge and tight. Used only for
   /// the screen's headline score; everything else stays on n48 and below.
+  static final sleepHero = hero.copyWith(fontSize: 84, letterSpacing: -5);
+  static final todayHero = hero.copyWith(fontSize: 96, height: 1);
+
   static const hero = TextStyle(
       fontFamily: _f,
       fontFamilyFallback: _fb,
@@ -457,6 +464,17 @@ class Motion {
   /// True when the platform is NOT asking for reduced motion.
   static bool enabled(BuildContext c) =>
       MediaQuery.maybeDisableAnimationsOf(c) != true;
+
+  static void syncHeartbeat(BuildContext context, AnimationController controller, int? bpm) {
+    if (bpm == null || !enabled(context)) {
+      controller.reset();
+      return;
+    }
+    final period = Duration(milliseconds: (60000 / bpm.clamp(35, 200)).round());
+    if (controller.isAnimating && controller.duration == period) return;
+    controller.duration = period;
+    controller.repeat();
+  }
 
   static const fast = Duration(milliseconds: 120);
 

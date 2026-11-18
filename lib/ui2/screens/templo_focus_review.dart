@@ -8,6 +8,7 @@ import '../../compute/pulso/insights.dart';
 import '../../data/day_label.dart';
 import '../../data/db.dart';
 import '../../state/pulso_store.dart';
+import '../skeleton/guide_plot.dart';
 import '../ui2.dart';
 import 'home_screen.dart' show repoOf;
 import 'metric_detail.dart';
@@ -108,7 +109,7 @@ Future<_SessionData> _analyze(
         })(),
     ],
     resets: [
-      if (pre != null) pre,
+      ?pre,
       for (final r in reset)
         if (r.t >= session.start && r.t <= stop) r,
     ],
@@ -155,8 +156,9 @@ class _TemploSessionReviewState extends State<TemploSessionReview> {
         future: _report,
         builder: (c, snapshot) {
           final d = snapshot.data;
-          if (snapshot.hasError)
+          if (snapshot.hasError) {
             return const Text('No se pudo recalcular la sesión.');
+          }
           if (d == null || snapshot.connectionState != ConnectionState.done) {
             return const LinearProgressIndicator();
           }
@@ -305,7 +307,7 @@ class _TemploSessionReviewState extends State<TemploSessionReview> {
   }
 }
 
-class _PulseTimeline extends CustomPainter {
+class _PulseTimeline extends CustomPainter implements GuidePlot {
   const _PulseTimeline(
     this.points,
     this.marks,
@@ -317,6 +319,9 @@ class _PulseTimeline extends CustomPainter {
   final List<_Marker> marks;
   final int start, end;
   final Color color;
+
+  @override
+  Color get guideLineColor => color;
 
   @override
   void paint(Canvas canvas, Size size) {

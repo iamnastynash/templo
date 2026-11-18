@@ -96,9 +96,10 @@ class TradeActions extends StatelessWidget {
         ),
       ],
       onSelected: (edit) async {
-        final changed = edit
-            ? await editFocusTrade(context, session, trade)
-            : await deleteFocusTrade(context, session, trade);
+        if (!context.mounted) return;
+        final changed = await (edit
+            ? editFocusTrade(context, session, trade)
+            : deleteFocusTrade(context, session, trade));
         if (changed && context.mounted) onChanged();
       },
     );

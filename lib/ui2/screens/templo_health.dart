@@ -3,6 +3,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../profile/profile.dart';
+import '../guides/help_entry.dart';
 import '../ui2.dart';
 import 'health_screen.dart';
 import 'home_screen.dart' show go, pad;
@@ -122,6 +123,7 @@ class TemploHealth extends StatelessWidget {
             ),
           ),
         ),
+        const HelpEntry(topic: GuideTopic.health),
       ],
     );
   }
