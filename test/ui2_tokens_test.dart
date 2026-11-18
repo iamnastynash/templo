@@ -74,10 +74,9 @@ final _rules = <_Rule>[
     allow: {
       _tokenFile,
       'lib/ui2/screens/home_screen.dart',
-      // Calendar window, sample refresh, BLE deadlines, and trade timestamps.
+      // Calendar window, sample refresh, and trade timestamps.
       'lib/ui2/screens/templo_focus_review.dart',
       'lib/ui2/screens/templo_live_pulse.dart',
-      'lib/ui2/screens/templo_oxygen.dart',
       'lib/ui2/screens/templo_trade_editor.dart',
     },
   ),

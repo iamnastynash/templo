@@ -87,25 +87,13 @@ class _TemploOxygenState extends State<TemploOxygen> {
 
   Future<void> _bluetooth() async {
     if (_working) return;
-    if (FlutterBluePlus.isScanningNow) {
-      setState(() => _message = 'Hay otra búsqueda Bluetooth en curso.');
-      return;
-    }
     setState(() {
       _working = true;
       _message = 'Buscando oxímetros Bluetooth…';
     });
     try {
-      await FlutterBluePlus.startScan(
-        withServices: [pulseOximeterService],
-        timeout: const Duration(seconds: 6),
-      );
-      await FlutterBluePlus.isScanning
-          .where((active) => !active)
-          .first
-          .timeout(const Duration(seconds: 10));
+      final results = await scanPulseOximeters();
       if (!mounted) return;
-      final results = FlutterBluePlus.lastScanResults;
       if (results.isEmpty) {
         setState(
           () => _message =

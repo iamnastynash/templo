@@ -3,6 +3,8 @@ import 'dart:math' as math;
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
+import 'ble_state.dart' show withScanLock;
+
 final pulseOximeterService = Guid('1822');
 final _spot = Guid('2a5e');
 final _continuous = Guid('2a5f');
@@ -44,6 +46,22 @@ double? decodePulseOximetry(List<int> data, {required bool continuous}) {
   final value = mantissa * math.pow(10, exponent);
   return value > 0 && value <= 100 ? value.toDouble() : null;
 }
+
+/// Find standard PLX peripherals without interrupting the strap or scale scan.
+Future<List<ScanResult>> scanPulseOximeters() => withScanLock(() async {
+  await FlutterBluePlus.startScan(
+    withServices: [pulseOximeterService],
+    timeout: const Duration(seconds: 6),
+  );
+  try {
+    await FlutterBluePlus.isScanning
+        .firstWhere((active) => !active)
+        .timeout(const Duration(seconds: 10));
+    return List.of(FlutterBluePlus.lastScanResults);
+  } finally {
+    if (FlutterBluePlus.isScanningNow) await FlutterBluePlus.stopScan();
+  }
+});
 
 Future<double> readPulseOximeter(BluetoothDevice device) async {
   final wasConnected = device.isConnected;
