@@ -238,8 +238,7 @@ class _DayLoaderState extends State<_DayLoader> {
 class PulsoTodayCard extends StatefulWidget {
   final PulsoDay? data;
   final bool summary;
-  final Widget? afterEnergy;
-  const PulsoTodayCard({super.key, this.data, this.summary = false, this.afterEnergy});
+  const PulsoTodayCard({super.key, this.data, this.summary = false});
 
   @override
   State<PulsoTodayCard> createState() => _PulsoTodayCardState();
@@ -302,7 +301,6 @@ class _PulsoTodayCardState extends State<PulsoTodayCard> {
           ],
         ]),
       ),
-      if (widget.afterEnergy case final after?) after,
       if (!widget.summary && share != null && d != null) ...[
         const SizedBox(height: S.x2),
         Surface(

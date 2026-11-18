@@ -1,5 +1,16 @@
 # Cambios de Templo
 
+## 0.12.2 · compilación 82
+
+- Revisión gráfica de Trading con entradas, salidas, reseteos, vuelta a la calma y carga de pulso.
+- Una sola tarjeta de respiración guiada de 60 segundos, con opción de empezar Trading al terminar. Comparaciones semanales y diario rápido con patrones de sueño.
+- Las sesiones guardadas se pueden editar o eliminar desde el resumen o deslizando la fila a la izquierda. Cada trade tiene su propio menú y una operación abierta se puede descartar.
+- El diario permite editar y borrar una entrada por fecha, incluidos sus valores y etiquetas.
+- Enfoque amplía el margen antes de Alerta. «Terminar» usa una cápsula naranja y el aro de pulso en verde lima late cuando hay señal.
+- Hoy agrupa sincronización, historial, actividad y diario en un menú. Perfil y ajustes se abre desde Salud.
+- Oxígeno con lectura de oxímetros Bluetooth PLX, registro manual, mediciones importadas y diagnóstico óptico de WHOOP.
+- Comparación de noches y de carreras con GPS, y tarjetas personalizables en Hoy.
+
 ## Rediseño de las pestañas y pulso en vivo
 
 - Hoy muestra el pulso en vivo cuando llega una lectura reciente por Bluetooth. Toca la tarjeta para abrir el gráfico y el historial de pulso en reposo.

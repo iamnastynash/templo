@@ -6,11 +6,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 import '../../compute/pulso/day_load.dart' show Pt;
 import '../../compute/pulso/focus.dart';
+import '../../compute/pulso/insights.dart';
 import '../../state/app_state.dart';
 import '../../theme/theme_switcher.dart' show themedRoute;
 import '../../state/pulso_store.dart';
@@ -19,6 +21,11 @@ import '../ui2.dart';
 import 'home_screen.dart' show repoOf, hm, go;
 import 'metric_detail.dart' show detailScaffold;
 import 'pulso_day.dart' show PulsoDay, PulsoBar;
+import 'calm_breathing.dart';
+import 'templo_focus_review.dart';
+import 'templo_insights.dart';
+import 'templo_trade_editor.dart';
+import 'templo_session_editor.dart';
 
 int _nowSec() => DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
@@ -75,12 +82,14 @@ class FocusTab extends StatelessWidget {
       builder: (c, _) {
         final store = PulsoStore.instance;
         final active = store.active;
+        final saved = store.sessions.where((s) => !s.open).toList()
+          ..sort((a, b) => b.start.compareTo(a.start));
         final now = _nowSec();
         final weekAgo = now - 7 * 24 * 3600;
         final week = [for (final s in store.sessions) if (s.start >= weekAgo) s];
         FocusSession? last(FocusKind k) {
-          for (final s in store.sessions.reversed) {
-            if (s.kind == k && !s.open) return s;
+          for (final s in saved) {
+            if (s.kind == k) return s;
           }
           return null;
         }
@@ -129,7 +138,7 @@ class FocusTab extends StatelessWidget {
               _card(c, 'Trading', lastLine(FocusKind.trading), 'Empezar',
                   active != null ? null : () => _start(c, FocusKind.trading)),
               const SizedBox(height: S.x2),
-              _card(c, 'Reseteo', 'Respiración guiada · inhala 4 s, exhala 6 s', '60 s',
+              _card(c, 'Respiración guiada', 'Un minuto para calmarte y volver a tu ritmo', '60 s',
                   () => go(c, const ResetScreen())),
               const SizedBox(height: S.x6),
               _over(c, 'Esta semana'),
@@ -139,30 +148,47 @@ class FocusTab extends StatelessWidget {
                   _weeklyDuration(week, FocusKind.trading)),
               _weekRow(
                   c,
-                  'Reseteos',
+                  'Respiraciones',
                   drops.isEmpty
                       ? '${resetsWeek.length}'
                       : '${resetsWeek.length} · −${(drops.reduce((a, b) => a + b) / drops.length).round()} lpm de media'),
               const SizedBox(height: S.x4),
-              if (store.sessions.any((s) => !s.open)) ...[
+              TextButton.icon(
+                onPressed: () => go(c, const TemploSessionComparisons()),
+                icon: const Icon(LucideIcons.chartNoAxesColumn, size: 17),
+                label: const Text('Comparar sesiones'),
+              ),
+              TextButton.icon(
+                onPressed: () => go(c, const TemploQuickJournal()),
+                icon: const Icon(LucideIcons.notebookPen, size: 17),
+                label: const Text('Diario rápido'),
+              ),
+              if (saved.isNotEmpty) ...[
                 _over(c, 'Sesiones'),
+                const SizedBox(height: S.x1),
+                _note(c, 'Desliza una sesión a la izquierda para editarla o eliminarla.'),
                 const SizedBox(height: S.x2),
-                for (final s in store.sessions.reversed.where((s) => !s.open).take(10))
-                  Pressable(
-                    onTap: () => go(c, FocusSummaryScreen(s)),
-                    semanticLabel: '${_kindName(s.kind)} ${_clock(s.start)}',
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: S.x3),
-                      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p.line))),
-                      child: Row(children: [
-                        Expanded(
-                            child: Text(
-                                '${_kindName(s.kind)} · ${_dayShort(s.start)} ${_clock(s.start)}',
-                                style: F.cap.copyWith(color: p.ink))),
-                        _note(c, hm((s.end! - s.start) / 60)),
-                        const SizedBox(width: S.x2),
-                        Icon(LucideIcons.chevronRight, size: 16, color: p.ink3),
-                      ]),
+                for (final s in saved)
+                  SessionSwipeActions(
+                    key: ObjectKey(s),
+                    session: s,
+                    child: Pressable(
+                      onTap: () => go(c, FocusSummaryScreen(s)),
+                      semanticLabel: '${_kindName(s.kind)} ${_clock(s.start)}',
+                      child: Container(
+                        constraints: const BoxConstraints(minHeight: 52),
+                        padding: const EdgeInsets.symmetric(vertical: S.x3),
+                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p.line))),
+                        child: Row(children: [
+                          Expanded(child: Text(
+                            '${_kindName(s.kind)} · ${_dayShort(s.start)} ${_clock(s.start)}',
+                            style: F.cap.copyWith(color: p.ink),
+                          )),
+                          _note(c, hm((s.end! - s.start) / 60)),
+                          const SizedBox(width: S.x2),
+                          Icon(LucideIcons.chevronRight, size: 16, color: p.ink3),
+                        ]),
+                      ),
                     ),
                   ),
               ],
@@ -275,15 +301,17 @@ class _FocusLiveScreenState extends State<FocusLiveScreen> {
     final hr = _owner?.liveHr;
     final now = _nowSec();
     if (hr != null) _bucket.add(hr);
-    if (now - _bucketStart >= 30) {
-      if (_bucket.isNotEmpty) {
-        PulsoStore.instance.addSample(
-            s, _bucketStart, _bucket.reduce((a, b) => a + b) / _bucket.length);
-      }
-      _bucket.clear();
-      _bucketStart = now;
-    }
+    if (now - _bucketStart >= 30) _flushSample(now);
     setState(() => _hr = hr);
+  }
+
+  void _flushSample(int now) {
+    if (_bucket.isNotEmpty) {
+      PulsoStore.instance.addSample(
+          s, _bucketStart, _bucket.reduce((a, b) => a + b) / _bucket.length);
+      _bucket.clear();
+    }
+    _bucketStart = now;
   }
 
   @override
@@ -294,7 +322,10 @@ class _FocusLiveScreenState extends State<FocusLiveScreen> {
   }
 
   void _finish() {
-    PulsoStore.instance.end(s, _nowSec());
+    if (!s.open) return;
+    final now = _nowSec();
+    _flushSample(now);
+    PulsoStore.instance.end(s, now);
     Navigator.of(context).pushReplacement(
         themedRoute((_) => FocusSummaryScreen(s), name: 'FocusSummaryScreen'));
   }
@@ -311,35 +342,24 @@ class _FocusLiveScreenState extends State<FocusLiveScreen> {
       c,
       _kindName(s.kind),
       sub: 'En curso · ${_dur(now - s.start)}',
-      trailing: Pressable(
-        onTap: _finish,
-        semanticLabel: 'Terminar sesión',
-        child: Text('Terminar', style: F.cap.copyWith(color: p.ink, fontWeight: FontWeight.w600)),
-      ),
+      trailingWidth: 112,
+      trailing: _FinishSessionButton(onTap: _finish),
       [
         const SizedBox(height: S.x3),
         _over(c, 'Tu estado ahora'),
         const SizedBox(height: S.x3),
         Row(children: [
-          Container(
-            width: 88,
-            height: 88,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: light == null ? p.card2 : _lightColor(p, light),
-              boxShadow: light == null
-                  ? null
-                  : [BoxShadow(color: _lightColor(p, light).withValues(alpha: p.glow), blurRadius: 18)],
-            ),
-            child: Text(hr == null ? '—' : '$hr',
-                style: F.n34.copyWith(color: light == null ? p.ink3 : C.carbon)),
+          _TradingPulse(
+            bpm: hr,
+            signalColor: light == null ? C.lime : _lightColor(p, light),
           ),
           const SizedBox(width: S.x4),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(light == null ? 'Sin pulso en vivo' : _lightName(light),
-                  style: F.t2.copyWith(color: light == null ? p.ink3 : p.ink)),
+              Text(
+                hr == null ? 'Sin pulso en vivo' : light == null ? 'Pulso en vivo' : _lightName(light),
+                style: F.t2.copyWith(color: hr == null ? p.ink3 : p.ink),
+              ),
               const SizedBox(height: S.x1),
               _note(
                   c,
@@ -369,17 +389,24 @@ class _FocusLiveScreenState extends State<FocusLiveScreen> {
               child: Row(children: [
                 Expanded(child: _over(c, 'En trade #${s.trades.length}')),
                 Text(_dur(now - open.start), style: F.head.copyWith(color: p.ink)),
+                TradeActions(session: s, trade: open, onChanged: () => setState(() {})),
               ]),
             ),
             const SizedBox(height: S.x3),
             BigButton('Salí del trade',
                 color: C.carbon,
                 onTap: () => setState(() => PulsoStore.instance.closeTrade(s, _nowSec()))),
+            TextButton(
+              onPressed: () async {
+                if (await deleteFocusTrade(c, s, open) && mounted) setState(() {});
+              },
+              child: const Text('Descartar trade'),
+            ),
           ] else ...[
             BigButton('Entré en un trade',
                 color: C.carbon,
                 onTap: () => setState(() => PulsoStore.instance.openTrade(
-                    s, _nowSec(), hr == null || base == null ? null : hr - base))),
+                    s, _nowSec(), hr == null || base == null ? null : hr - base, bpm: hr?.toDouble()))),
             if (lastClosed != null) ...[
               const SizedBox(height: S.x3),
               _note(c, '¿Cómo salió el trade #${s.trades.length}?'),
@@ -391,9 +418,22 @@ class _FocusLiveScreenState extends State<FocusLiveScreen> {
               ]),
             ],
           ],
-          const SizedBox(height: S.x4),
-          for (final t in s.trades.reversed.where((t) => t.end != null))
-            _tradeRow(c, s.trades.indexOf(t) + 1, t, null),
+          if (s.trades.any((trade) => trade.end != null)) ...[
+            const SizedBox(height: S.x4),
+            Text('Operaciones de esta sesión', style: F.head.copyWith(color: p.ink)),
+            const SizedBox(height: S.x2),
+            for (final (index, trade) in s.trades.indexed.toList().reversed)
+              if (trade.end != null)
+                _tradeRow(c, s, index + 1, trade, null, () => setState(() {})),
+          ],
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              onPressed: () => go(c, const ResetScreen()),
+              icon: const Icon(LucideIcons.wind, size: 16),
+              label: const Text('Respiración guiada · 60 s'),
+            ),
+          ),
         ],
         const SizedBox(height: S.x6),
         _note(c, 'La banda no vibra durante la sesión. Al terminar verás tu pulso '
@@ -422,7 +462,154 @@ class _FocusLiveScreenState extends State<FocusLiveScreen> {
   }
 }
 
-Widget _tradeRow(BuildContext c, int n, Trade t, WindowStats? st) {
+class _FinishSessionButton extends StatelessWidget {
+  const _FinishSessionButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    const flame = Color(0xFFFF7A25);
+    return Pressable(
+      onTap: onTap,
+      semanticLabel: 'Terminar sesión',
+      child: Container(
+        constraints: const BoxConstraints(minHeight: S.tap),
+        padding: const EdgeInsets.symmetric(horizontal: S.x3, vertical: S.x2),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFFFBC66), flame],
+          ),
+          borderRadius: R.rPill,
+          boxShadow: [
+            BoxShadow(color: flame.withValues(alpha: .48), blurRadius: 16),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(LucideIcons.square, size: 13, color: C.carbon),
+            const SizedBox(width: S.x1),
+            Flexible(
+              child: Text('Terminar', style: F.cap.copyWith(
+                color: C.carbon, fontWeight: FontWeight.w700,
+              )),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TradingPulse extends StatefulWidget {
+  const _TradingPulse({required this.bpm, required this.signalColor});
+
+  final int? bpm;
+  final Color signalColor;
+
+  @override
+  State<_TradingPulse> createState() => _TradingPulseState();
+}
+
+class _TradingPulseState extends State<_TradingPulse>
+    with SingleTickerProviderStateMixin {
+  late final _beat = AnimationController(vsync: this);
+  static final _heartbeat = TweenSequence<double>([
+    TweenSequenceItem(tween: Tween(begin: 0, end: 1), weight: 11),
+    TweenSequenceItem(tween: Tween(begin: 1, end: .18), weight: 16),
+    TweenSequenceItem(tween: Tween(begin: .18, end: .62), weight: 10),
+    TweenSequenceItem(tween: Tween(begin: .62, end: 0), weight: 19),
+    TweenSequenceItem(tween: ConstantTween(0.0), weight: 44),
+  ]);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncBeat();
+  }
+
+  @override
+  void didUpdateWidget(covariant _TradingPulse oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncBeat();
+  }
+
+  void _syncBeat() {
+    final bpm = widget.bpm;
+    if (bpm == null || MediaQuery.disableAnimationsOf(context)) {
+      _beat.reset();
+      return;
+    }
+    final period = Duration(milliseconds: (60000 / bpm.clamp(35, 200)).round());
+    if (_beat.isAnimating && _beat.duration == period) return;
+    _beat.duration = period;
+    _beat.repeat();
+  }
+
+  @override
+  void dispose() {
+    _beat.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = P.of(context);
+    final bpm = widget.bpm;
+    return SizedBox(
+      width: 96,
+      height: 96,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AnimatedBuilder(
+            animation: _beat,
+            builder: (_, _) {
+              final energy = _heartbeat.evaluate(_beat);
+              return Transform.scale(
+                scale: 1 + .13 * energy,
+                child: Container(
+                  width: 78,
+                  height: 78,
+                  decoration: BoxDecoration(
+                    color: bpm == null ? p.card2 : C.carbon,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: bpm == null ? p.line : widget.signalColor,
+                      width: 1.5,
+                    ),
+                    boxShadow: bpm == null ? null : [
+                      BoxShadow(
+                        color: widget.signalColor.withValues(alpha: .20 + .30 * energy),
+                        blurRadius: 10 + 15 * energy,
+                        spreadRadius: 2 * energy,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.all(S.x4),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                bpm == null ? '—' : '$bpm',
+                style: F.n34.copyWith(color: bpm == null ? p.ink3 : C.lime),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Widget _tradeRow(BuildContext c, FocusSession session, int n, Trade t, WindowStats? st, VoidCallback onChanged) {
   final p = P.of(c);
   final res = t.result == 'win'
       ? 'ganada'
@@ -430,21 +617,28 @@ Widget _tradeRow(BuildContext c, int n, Trade t, WindowStats? st) {
           ? 'perdida'
           : 'sin marcar';
   final peak = st?.peak;
-  return Container(
-    padding: const EdgeInsets.symmetric(vertical: S.x3),
-    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p.line))),
-    child: Row(children: [
-      Expanded(
-          child: Text('#$n · ${_clock(t.start)} · $res',
-              style: F.cap.copyWith(color: p.ink))),
-      Text(
-          peak == null
-              ? (t.end == null ? '' : _dur(t.end! - t.start))
-              : 'pico ${peak.round()}',
-          style: F.cap.copyWith(
-              color: t.result == 'loss' ? p.on(p.qualityOf(0)) : p.ink,
-              fontWeight: FontWeight.w600)),
-    ]),
+  return Padding(
+    padding: const EdgeInsets.only(bottom: S.x2),
+    child: Surface(
+      pad: const EdgeInsets.fromLTRB(S.x3, S.x1, S.x2, S.x1),
+      child: Row(children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Trade #$n', style: F.head.copyWith(color: p.ink)),
+              Text(
+                '${_clock(t.start)} · $res'
+                '${peak != null ? ' · pico ${peak.round()} lpm' : ''}',
+                style: F.cap.copyWith(color: p.ink3),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: S.x2),
+        TradeActions(session: session, trade: t, onChanged: onChanged),
+      ]),
+    ),
   );
 }
 
@@ -512,6 +706,32 @@ class _FocusSummaryScreenState extends State<FocusSummaryScreen> {
 
     return detailScaffold(c, title, sub: '${_clock(s.start)} a ${_clock(end)} · ${hm((end - s.start) / 60)}', [
       const SizedBox(height: S.x2),
+      if (!s.open && PulsoStore.instance.sessions.contains(s))
+        Wrap(spacing: S.x2, children: [
+          TextButton.icon(
+            icon: const Icon(LucideIcons.pencil, size: 16),
+            label: const Text('Editar sesión'),
+            onPressed: () async {
+              if (await editFocusSession(c, s) && mounted) setState(() {});
+            },
+          ),
+          TextButton.icon(
+            icon: const Icon(LucideIcons.trash2, size: 16),
+            label: const Text('Eliminar sesión'),
+            onPressed: () async {
+              if (await deleteFocusSession(c, s) && c.mounted) Navigator.pop(c);
+            },
+          ),
+        ]),
+      BigButton('Revisar pulso, trades y reseteos', soft: true,
+          icon: LucideIcons.chartNoAxesColumn,
+          onTap: () async {
+            await Navigator.of(c).push(themedRoute(
+              (_) => TemploSessionReview(s), name: 'TemploSessionReview',
+            ));
+            if (mounted) setState(() {});
+          }),
+      const SizedBox(height: S.x3),
       if (above != null) ...[
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('${above >= 0 ? '+' : ''}${above.round()}', style: F.hero.copyWith(color: p.ink)),
@@ -553,7 +773,7 @@ class _FocusSummaryScreenState extends State<FocusSummaryScreen> {
           const SizedBox(height: S.x2),
           _note(c, 'No marcaste trades en esta sesión.'),
         ],
-        for (var i = 0; i < s.trades.length; i++) _tradeRow(c, i + 1, s.trades[i], tradeStats[i]),
+        for (var i = 0; i < s.trades.length; i++) _tradeRow(c, s, i + 1, s.trades[i], tradeStats[i], () => setState(() {})),
         const SizedBox(height: S.x4),
         Surface(
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -594,6 +814,13 @@ class _ResetScreenState extends State<ResetScreen> {
   bool _inhale = true;
   final _hr = <({int s, int v})>[];
   ResetResult? _result;
+  double? _before;
+  (int?, int?)? _lastSample;
+  bool _completed = false;
+  bool _startingTrade = false;
+  StreamSubscription<List<int>>? _rrSubscription;
+  final _rr = <int, List<double>>{};
+  ({double delta, int cycles})? _phaseResponse;
 
   int get _total => Motion.resetLength.inSeconds;
   int get _in => Motion.resetIn.inSeconds;
@@ -613,30 +840,50 @@ class _ResetScreenState extends State<ResetScreen> {
   @override
   void dispose() {
     _tick?.cancel();
+    _rrSubscription?.cancel();
     _owner?.releaseLiveHrView();
     super.dispose();
   }
 
   void _start() {
+    if (_running) return;
+    _before = _owner?.liveHr?.toDouble();
+    _rr.clear();
+    _rrSubscription?.cancel();
+    _rrSubscription = _owner?.focusRr.listen((intervals) {
+      if (!_running || _elapsed >= _total) return;
+      final rates = [
+        for (final rr in intervals)
+          if (rr >= 300 && rr <= 2000) 60000 / rr,
+      ];
+      if (rates.isNotEmpty) _rr.putIfAbsent(_elapsed, () => []).addAll(rates);
+    });
     setState(() {
+      _completed = false;
+      _phaseResponse = null;
       _running = true;
       _elapsed = 0;
       _inhale = true;
       _hr.clear();
+      _lastSample = null;
     });
-    _owner?.buzzBreathPhase(BreathPhaseKind.inhale);
+    _cue(BreathPhaseKind.inhale);
     _tick = Timer.periodic(Motion.tick, (_) {
       if (!mounted) return;
       final e = _elapsed + 1;
       final hr = _owner?.liveHr;
-      if (hr != null) _hr.add((s: e, v: hr));
+      final sample = (_owner?.liveHrTraceRev, _owner?.device.liveHrAt);
+      if (hr != null && sample != _lastSample) {
+        _lastSample = sample;
+        _hr.add((s: e, v: hr));
+      }
       if (e >= _total) {
         _finish();
         return;
       }
       final phase = e % _cycle;
-      if (phase == 0) _owner?.buzzBreathPhase(BreathPhaseKind.inhale);
-      if (phase == _in) _owner?.buzzBreathPhase(BreathPhaseKind.exhale);
+      if (phase == 0) _cue(BreathPhaseKind.inhale);
+      if (phase == _in) _cue(BreathPhaseKind.exhale);
       setState(() {
         _elapsed = e;
         _inhale = phase < _in;
@@ -644,17 +891,42 @@ class _ResetScreenState extends State<ResetScreen> {
     });
   }
 
+  void _cue(BreathPhaseKind phase) {
+    final band = _owner;
+    if (band?.isConnected == true) {
+      band!.buzzBreathPhase(phase);
+    } else if (phase == BreathPhaseKind.inhale) {
+      unawaited(HapticFeedback.mediumImpact());
+    } else {
+      unawaited(HapticFeedback.selectionClick());
+    }
+  }
+
+  void _startTrading() {
+    if (!_completed || _startingTrade || PulsoStore.instance.active != null) return;
+    _startingTrade = true;
+    final session = PulsoStore.instance.start(FocusKind.trading, _nowSec());
+    Navigator.of(context).pushReplacement(
+        themedRoute((_) => FocusLiveScreen(session), name: 'FocusLiveScreen'));
+  }
+
   void _finish() {
     _tick?.cancel();
+    _rrSubscription?.cancel();
+    _rrSubscription = null;
     _owner?.buzzSessionComplete();
+    final phase = breathPhaseResponse(_rr.map((s, values) => MapEntry(s, median(values)!)));
     double? mean(Iterable<int> v) =>
         v.isEmpty ? null : v.reduce((a, b) => a + b) / v.length;
-    final before = mean([for (final x in _hr) if (x.s <= 8) x.v]);
-    final after = mean([for (final x in _hr) if (x.s > _total - 10) x.v]);
+    final tail = [for (final x in _hr) if (x.s > _total - 10) x.v];
+    final before = _before;
+    final after = tail.length >= 5 ? mean(tail) : null;
     final r = ResetResult(_nowSec() - _total, before, after);
     PulsoStore.instance.addReset(r);
     setState(() {
       _running = false;
+      _completed = true;
+      _phaseResponse = phase;
       _result = r;
     });
   }
@@ -664,7 +936,7 @@ class _ResetScreenState extends State<ResetScreen> {
     final p = P.of(c);
     final r = _result;
     final drop = r?.drop;
-    return detailScaffold(c, 'Reseteo', sub: '${_total ~/ 60 == 1 ? '60 s' : '$_total s'} · 4 s inhalar, 6 s exhalar', [
+    return detailScaffold(c, 'Respiración guiada', sub: '${_total ~/ 60 == 1 ? '60 s' : '$_total s'} · 4 s inhalar, 6 s exhalar', [
       const SizedBox(height: S.x6),
       Center(
         child: SizedBox(
@@ -713,18 +985,42 @@ class _ResetScreenState extends State<ResetScreen> {
         child: Text(
             _running
                 ? '${_total - _elapsed} s'
-                : 'La banda te guía con vibraciones suaves. Puedes cerrar los ojos.',
+                : 'Sigue el aro o la vibración de la banda o del teléfono.',
             textAlign: TextAlign.center,
             style: F.body.copyWith(color: p.ink)),
       ),
       const SizedBox(height: S.x5),
       if (!_running)
-        BigButton('Empezar reseteo', color: C.carbon, onTap: _start)
+        BigButton('Empezar respiración', color: C.carbon, onTap: _start)
       else
         BigButton('Parar', soft: true, color: C.carbon, onTap: () {
           _tick?.cancel();
+          _rrSubscription?.cancel();
+          _rrSubscription = null;
           setState(() => _running = false);
         }),
+      if (_hr.length >= 2) ...[
+        const SizedBox(height: S.x4),
+        _over(c, 'Respuesta del pulso'),
+        GlowLine([for (final point in _hr) point.v.toDouble()], color: p.on(C.coral), height: 64),
+      ],
+      if (_phaseResponse case final phase?) ...[
+        const SizedBox(height: S.x3),
+        Surface(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _over(c, 'Pulso y respiración'),
+          _say(c, '${phase.delta >= 0 ? '+' : '−'}${phase.delta.abs().toStringAsFixed(1)} lpm al inhalar frente a exhalar'),
+          _note(c, '${phase.cycles} ciclos con intervalos entre latidos suficientes'),
+        ])),
+      ],
+      if (_completed && PulsoStore.instance.active == null) ...[
+        const SizedBox(height: S.x3),
+        BigButton('Empezar Trading', color: C.coral, onTap: _startTrading),
+      ],
+      if (!_running)
+        TextButton(
+          onPressed: () => go(c, const CalmBreathing()),
+          child: const Text('Respiración con coherencia cardíaca'),
+        ),
       if (r != null) ...[
         const SizedBox(height: S.x4),
         Surface(

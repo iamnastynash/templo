@@ -77,9 +77,26 @@ class PulsoStore extends ChangeNotifier {
     _save();
   }
 
-  void openTrade(FocusSession s, int now, double? entryAbove) {
+  bool editSession(FocusSession session, {required int start, required int end, required int now}) {
+    if (!sessions.contains(session) || session.open || start >= end || end > now ||
+        session.trades.any((trade) => trade.start < start || (trade.end ?? end + 1) > end)) {
+      return false;
+    }
+    session.start = start;
+    session.end = end;
+    _save();
+    return true;
+  }
+
+  bool deleteSession(FocusSession session) {
+    if (session.open || !sessions.remove(session)) return false;
+    _save();
+    return true;
+  }
+
+  void openTrade(FocusSession s, int now, double? entryAbove, {double? bpm}) {
     if (s.openTrade != null) return;
-    s.trades.add(Trade(now, entryAbove: entryAbove));
+    s.trades.add(Trade(now, entryAbove: entryAbove, entryBpm: bpm));
     _save();
   }
 
@@ -91,6 +108,34 @@ class PulsoStore extends ChangeNotifier {
   void markResult(Trade t, String result) {
     t.result = t.result == result ? null : result;
     _save();
+  }
+
+  bool editTrade(FocusSession session, Trade trade, {
+    required int start, required int? end, required String? result,
+    required int now,
+  }) {
+    final index = session.trades.indexOf(trade);
+    if (index < 0 || (trade.end == null) != (end == null) ||
+        (result != null && result != 'win' && result != 'loss')) return false;
+    final earliest = index == 0 ? session.start : session.trades[index - 1].end;
+    final latest = index + 1 == session.trades.length
+        ? session.end ?? now : session.trades[index + 1].start;
+    if (earliest == null || start < earliest || start > latest ||
+        (end != null && (end < start || end > latest))) return false;
+
+    session.trades[index] = Trade(
+      start, end: end, result: result,
+      entryAbove: start == trade.start ? trade.entryAbove : null,
+      entryBpm: start == trade.start ? trade.entryBpm : null,
+    );
+    _save();
+    return true;
+  }
+
+  bool deleteTrade(FocusSession session, Trade trade) {
+    if (!session.trades.remove(trade)) return false;
+    _save();
+    return true;
   }
 
   void addSample(FocusSession s, int t, double v) {

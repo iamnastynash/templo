@@ -961,7 +961,7 @@ class _SleepDetailState extends State<SleepDetail> with RevisionReload {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(S.x4, S.x4, S.x4, S.x16),
         children: [
-          ScreenTitle(title, trailing: const ProfileAvatar(accent: C.coral)),
+          ScreenTitle(title),
           const SizedBox(height: S.x4),
           Text((l?.sleepDetailTotalSleep ?? 'Total sleep').toUpperCase(),
               style: F.over.copyWith(color: p.ink3)),

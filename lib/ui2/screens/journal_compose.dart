@@ -55,6 +55,7 @@ class _JournalComposeState extends State<JournalCompose> {
   bool _loading = true;
   bool _loadFailed = false;
   bool _saving = false;
+  bool _hasEntry = false;
 
   @override
   void initState() {
@@ -80,7 +81,7 @@ class _JournalComposeState extends State<JournalCompose> {
     try {
       specs = await repo.getJournalFields();
       values = await repo.getJournalMetrics(_date);
-      entries = await repo.getJournal(range: '30d');
+      entries = await repo.getJournal(range: 'all');
     } catch (_) {
       // A locked or swapped-out database used to leave the form on its
       // spinner for good. Say so and offer a retry instead.
@@ -106,6 +107,7 @@ class _JournalComposeState extends State<JournalCompose> {
       _note.text = (today?['note'] as String?) ?? '';
       _loading = false;
       _loadFailed = false;
+      _hasEntry = today != null || values.isNotEmpty;
     });
   }
 
@@ -250,6 +252,41 @@ class _JournalComposeState extends State<JournalCompose> {
     Navigator.of(context).pop(true);
   }
 
+  Future<void> _deleteEntry() async {
+    final app = context.read<AppState>();
+    final repo = app.repo;
+    if (repo == null || _saving) return;
+    final es = Localizations.localeOf(context).languageCode == 'es';
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(es ? '¿Borrar entrada?' : 'Delete entry?'),
+        content: Text(es
+            ? 'Se borrarán la nota, las etiquetas y los valores del diario de $_date.'
+            : 'The note, tags and journal values for $_date will be deleted.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: Text(es ? 'Cancelar' : 'Cancel')),
+          TextButton(onPressed: () => Navigator.pop(c, true), child: Text(es ? 'Borrar' : 'Delete')),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+    setState(() => _saving = true);
+    try {
+      await repo.deleteJournal(_date);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(es ? 'No se pudo borrar la entrada.' : 'Could not delete the entry.'),
+      ));
+      return;
+    }
+    if (!mounted) return;
+    unawaited(app.refreshAiReminders());
+    Navigator.pop(context, true);
+  }
+
   Future<void> _write(LocalRepository repo) async {
     // Both writes REPLACE the day, and the strap's double-tap (a glass of
     // water, a moment tag) writes the same day while this screen is open.
@@ -267,7 +304,7 @@ class _JournalComposeState extends State<JournalCompose> {
       }
     });
     final tags = <String>{};
-    for (final e in await repo.getJournal(range: '30d')) {
+    for (final e in await repo.getJournal(range: 'all')) {
       if (e['date'] == _date) {
         tags.addAll(((e['tags'] as List?) ?? const []).map((t) => t.toString()));
       }
@@ -324,6 +361,16 @@ class _JournalComposeState extends State<JournalCompose> {
                   : ListView(
                       padding: const EdgeInsets.fromLTRB(S.x4, 0, S.x4, S.x8),
                       children: [
+                        if (_hasEntry)
+                          Align(
+                            alignment: AlignmentDirectional.centerEnd,
+                            child: TextButton.icon(
+                              onPressed: _saving ? null : _deleteEntry,
+                              icon: const Icon(LucideIcons.trash2, size: 16),
+                              label: Text(Localizations.localeOf(c).languageCode == 'es'
+                                  ? 'Borrar entrada' : 'Delete entry'),
+                            ),
+                          ),
                         MoodPicker(
                           value: _values['mood']?.value.round(),
                           onChanged: (v) => _set('mood', v?.toDouble()),
@@ -394,7 +441,7 @@ class _JournalComposeState extends State<JournalCompose> {
                             spacing: S.x2,
                             runSpacing: S.x2,
                             children: [
-                              for (final t in kJournalPresetTags)
+                              for (final t in {...kJournalPresetTags, ...kTemploQuickTags.keys, ..._loadedTags, ..._tags})
                                 Pressable(
                                   onTap: () => setState(
                                     () => _tags.contains(t)

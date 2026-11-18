@@ -2321,7 +2321,7 @@ class _HomeScreenState extends State<HomeScreen> with RevisionReload {
   /// gets the same connecting/syncing feedback as every other one. Returns
   /// null when none of the three phases apply, so the caller falls through
   /// to its own "nothing yet" copy.
-  Widget? _phaseStatusCard(BuildContext c, AppLocalizations? l) {
+  Widget? _phaseStatusCard(BuildContext c, AppLocalizations? l, {bool compact = false}) {
     final syncing = syncingNowOf(c);
     final deriving = derivingOf(c);
     // The tap latch is otherwise cleared only by its 20s grace timer — if
@@ -2338,27 +2338,32 @@ class _HomeScreenState extends State<HomeScreen> with RevisionReload {
       child: CircularProgressIndicator(strokeWidth: 2, color: P.of(c).ink3),
     );
 
+    Widget phase(String title, String body) => compact
+        ? Row(children: [
+            spinner,
+            const SizedBox(width: S.x2),
+            Flexible(child: Text(title, style: F.cap.copyWith(color: P.of(c).ink3))),
+          ])
+        : StatusCard(title, body, leading: spinner);
+
     if (syncing) {
-      return StatusCard(
+      return phase(
         l?.homeSyncingTitle ?? 'Syncing with your band',
         l?.homeSyncingBody ?? 'Pulling data now — this can take a few minutes '
             'on a full backlog.',
-        leading: spinner,
       );
     }
     if (deriving) {
-      return StatusCard(
+      return phase(
         l?.homeAnalyzingTitle ?? 'Crunching last night\'s numbers',
         l?.homeAnalyzingBody ?? 'The data is in — sleep, recovery and strain '
             'are next.',
-        leading: spinner,
       );
     }
     if (_syncTapped) {
-      return StatusCard(
+      return phase(
         l?.homeConnectingTitle ?? 'Connecting to your band',
         l?.homeConnectingBody ?? 'Hang on — this usually takes a few seconds.',
-        leading: spinner,
       );
     }
     return null;
@@ -2419,7 +2424,9 @@ class _HomeScreenState extends State<HomeScreen> with RevisionReload {
     final d = _d;
     if (widget.onOpenActivity case final openActivity?) {
       final sync = syncOf(c);
-      final status = _phaseStatusCard(c, l) ?? noBandCard(c, l);
+      final app = c.read<AppState?>();
+      final paired = c.select<AppState?, bool>((a) => a?.isPaired ?? false);
+      final status = _phaseStatusCard(c, l, compact: true);
       return _refreshable(ListView(padding: pad, children: [
         if (dbRebuiltCard(dbRebuildOf(c), l) case final rebuilt?) rebuilt,
         if (d != null) ...?_bodyWatch(c, d, todayLabel(widget.now)),
@@ -2427,13 +2434,14 @@ class _HomeScreenState extends State<HomeScreen> with RevisionReload {
           date: prettyDay(todayLabel(widget.now), l),
           data: d,
           revision: d,
-          status: status ?? (d?.readiness.value == null && sync != null
-              ? Align(alignment: Alignment.centerLeft, child: TextButton.icon(
-                  onPressed: () => _tapSync(sync),
-                  icon: const Icon(LucideIcons.refreshCw),
-                  label: Text(l?.homeSyncBand ?? 'Sync the band'),
-                ))
-              : null),
+          status: status,
+          bandAction: app == null
+              ? null
+              : paired && sync != null
+                  ? (label: l?.homeSyncBand ?? 'Sync the band',
+                      icon: LucideIcons.refreshCw, onTap: () => _tapSync(sync))
+                  : (label: l?.devicesPairABand ?? 'Pair a band',
+                      icon: LucideIcons.watch, onTap: () => goto(c, const RePair())),
           onRecovery: () => go(c, const ReadinessDetail()),
           onStrain: () => go(c, const DayStrainDetail()),
           onSleep: () => go(c, const SleepDetail()),

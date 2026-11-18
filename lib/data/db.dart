@@ -3076,15 +3076,17 @@ class LocalDb {
   /// and `SmartWakeSample.fromRow` requires all four non-null.
   static Future<List<Map<String, Object?>>> onehzHrAccelBetween(
     int sinceEpochSec,
-    int untilEpochSec,
-  ) async {
+    int untilEpochSec, {
+    String? deviceId,
+  }) async {
     final db = await instance;
     return db.query(
       'decoded_onehz',
       columns: const ['rec_ts', 'hr', 'ax', 'ay', 'az'],
       where: 'rec_ts >= ? AND rec_ts <= ? '
-          'AND hr IS NOT NULL AND ax IS NOT NULL AND ay IS NOT NULL AND az IS NOT NULL',
-      whereArgs: [sinceEpochSec, untilEpochSec],
+          'AND hr IS NOT NULL AND ax IS NOT NULL AND ay IS NOT NULL AND az IS NOT NULL'
+          '${deviceId == null ? '' : ' AND device_id = ?'}',
+      whereArgs: [sinceEpochSec, untilEpochSec, if (deviceId != null) deviceId],
       orderBy: 'rec_ts ASC',
     );
   }
@@ -14908,6 +14910,14 @@ class LocalDb {
       'note': note,
       'updated_at': DateTime.now().millisecondsSinceEpoch,
     }, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  static Future<void> deleteJournal(String date) async {
+    final db = await instance;
+    await db.transaction((txn) async {
+      await txn.delete('journal', where: 'date = ?', whereArgs: [date]);
+      await txn.delete('journal_metric', where: 'date = ?', whereArgs: [date]);
+    });
   }
 
   /// Recent journal rows, newest first. [sinceDaysEpoch] (a YYYY-MM-DD label) is

@@ -56,10 +56,10 @@ Una sola frase en Hoy, sacada de tus propios números.
 </td><td width="50%" valign="top">
 
 **Enfoque: Trabajo y Trading**
-Sesiones que no cuentan como ejercicio. En trading marcas cada entrada y salida y si fue ganada o perdida. Un semáforo te dice si estás en calma, alerta o acelerado según tu pulso. Con 20 trades verás en qué estado operas mejor.
+Sesiones que no cuentan como ejercicio. En trading marcas cada entrada y salida y si fue ganada o perdida. Un semáforo te dice si estás en calma, alerta o acelerado según tu pulso. El resumen marca entradas, salidas y reseteos, y compara las operaciones ganadas y perdidas con sus recuentos.
 
-**Reseteo**
-60 segundos de respiración 4-6 guiada por la vibración de la banda. Lo empiezas tú; la banda nunca vibra sola.
+**Respiración guiada**
+Una tarjeta de 60 segundos para calmarte. Sigue el ritmo de inhalar 4 s y exhalar 6 s con el aro o la vibración. Al terminar puedes empezar Trading desde ahí.
 
 </td></tr>
 <tr><td valign="top">
@@ -94,7 +94,17 @@ Minimalista, con modo día y noche, un número protagonista por pantalla y gráf
 
 **Honestidad ante todo:** si falta un dato, la app muestra "—" y dice por qué. Nunca rellena con números inventados. Energía y Edad del cuerpo son estimaciones y lo dicen. Nada de esto es un diagnóstico médico.
 
-**Lo que no hace:** no mide oxígeno en sangre. La WHOOP 4.0 no da una lectura fiable de SpO₂ por Bluetooth, así que no se muestra.
+**Oxígeno.** Templo registra lecturas de un oxímetro Bluetooth con servicio estándar PLX o entradas manuales, y muestra las lecturas importadas de WHOOP. La señal óptica disponible de la banda se puede inspeccionar sin convertirla en un porcentaje de SpO₂.
+
+**Nuevas herramientas.** Vuelta a tu pulso previo, carga de sesión, diario rápido editable, comparación nocturna, pulso al mismo ritmo con GPS y tarjetas configurables en Hoy. [Cómo se calculan y qué datos requieren](docs/METRICAS_TEMPLO.md).
+
+### Gestionar tus sesiones y tu diario
+
+- **Enfoque → Sesiones.** Desliza una sesión guardada hacia la izquierda o abre su resumen para editar el horario o eliminarla. Cada operación tiene su propio menú **···**. Una operación abierta por error se puede descartar durante la sesión.
+- **Hoy → ··· → Diario rápido.** Edita la entrada de hoy o busca una fecha anterior. El editor permite cambiar etiquetas, notas y campos, y borrar una entrada con confirmación.
+- **Salud → Perfil y ajustes.** Accede a la configuración y elige qué tarjetas aparecen en Hoy.
+
+Consulta el [registro de cambios de la compilación 82](CHANGELOG.md).
 
 ## ✦ Instalarla
 

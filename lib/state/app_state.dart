@@ -2219,6 +2219,7 @@ class AppState extends ChangeNotifier {
     }
     _sync.cancelQuietTimer();
     _disposed = true;
+    unawaited(_focusRr.close());
     _derive.dispose();
     _ecg?.dispose();
     _ecgTransport?.dispose();
@@ -3816,6 +3817,9 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  final _focusRr = StreamController<List<int>>.broadcast();
+  Stream<List<int>> get focusRr => _focusRr.stream;
+
   // Ephemeral live high-rate frame (0x28/0x2B/0x33) — NOT persisted. The
   // breathing session taps the RR-bearing frames (0x28 compact HR, 0x2B R10)
   // into its in-memory buffer. Cheap-bounded; cleared at each session start.
@@ -3833,6 +3837,12 @@ class AppState extends ChangeNotifier {
     // (byte[1] != 10) — realtimeRr already yields no beats from it, but it
     // should not occupy the breathing R-R buffer at all (edge#286).
     final isRrBearing = pt == 0x28 || (pt == 0x2B && _isR10Record(hex));
+    if (isRrBearing && _focusRr.hasListener && !_focusRr.isClosed) {
+      final frame = proto.realtimeRr(hex);
+      if (frame != null && frame.rrMs.isNotEmpty) {
+        _focusRr.add(List<int>.of(frame.rrMs));
+      }
+    }
     if ((breathingActive || breathingWindowOpen) && isRrBearing) {
       _breathingController.tapFrame(hex);
     }

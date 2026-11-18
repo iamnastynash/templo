@@ -97,22 +97,39 @@ sueño, HRV, esfuerzo y estrés en el teléfono.
 4. Esfuerzo bueno frente a estrés: porcentaje del día, línea del tiempo y
    tramos de 10 minutos o más. Un minuto sin dato de movimiento no se clasifica.
 5. Consejo del día: una frase basada en los datos de hoy.
-6. Pestaña Enfoque (añádela AL FINAL de las pestañas para no romper las guías):
-   - Sesiones de Trabajo y de Trading que NO cuentan como ejercicio ni se
-     exportan a Apple Health.
-   - Trading: botones "Entré en un trade" / "Salí", ganada o perdida, semáforo
-     con el pulso en vivo frente a tu base despierto (calma hasta +5, alerta hasta
-     +12, acelerado por encima), resumen con pico y media por trade, y con 20
-     trades marcados una frase que compare el pulso al entrar en ganados y
-     perdidos.
-   - Guarda solo agregados (medias de 30 s), nunca el flujo en vivo crudo.
-7. Reseteo: 60 s de respiración 4 s / 6 s guiada por la vibración de la banda.
-   Solo cuando el usuario lo pulsa; la banda nunca vibra sola. Al final muestra
-   cuánto bajó el pulso.
+6. Pestaña Enfoque:
+   - Sesiones de Trabajo y Trading que no cuentan como ejercicio y no se exportan
+     a Apple Health. Permite corregir horarios y eliminar sesiones guardadas con
+     confirmación, desde el resumen y al deslizar una fila a la izquierda.
+   - En Trading, marca entrada, salida y resultado de cada operación. Da a cada
+     operación un menú para editarla o eliminarla y permite descartar una operación
+     abierta. Conserva el resto de la sesión.
+   - El indicador usa pulso reciente. Para Alerta, toma el mayor de 80 lpm y la
+     base despierto +12. Para Acelerado, el mayor de 95 lpm y la base +22.
+   - Muestra un resumen con marcadores de entrada, salida y respiración, pico,
+     carga por encima de la base y vuelta a tu rango previo con señal suficiente.
+     Compara sesiones y resultados con medianas y recuentos, sin inferir causas.
+   - Guarda agregados de pulso en lugar del flujo crudo en vivo.
+7. Una tarjeta de Respiración guiada: 60 s de inhalar 4 s y exhalar 6 s, con aro
+   y vibración. Muestra el pulso inicial y final si hay señal y permite iniciar
+   Trading después. Respeta la opción de movimiento reducido del sistema.
 8. Edad del cuerpo (estimación): edad real más unos años acotados por hábito
    (VO2max, pulso en reposo, HRV, horas y regularidad del sueño, ejercicio
    semanal, estrés) en las últimas 4 semanas. Sin estimación con menos de 3
    hábitos o sin edad. Muestra qué suma y qué resta años.
+
+9. Un diario rápido con etiquetas de un toque, edición por fecha, borrado con
+   confirmación y comparación del sueño en noches con y sin etiqueta.
+10. En Salud, muestra oxígeno de un oxímetro Bluetooth con servicio estándar PLX,
+    entradas manuales o mediciones importadas, siempre con fuente y fecha.
+    Inspecciona los canales rojo e infrarrojo de la banda como diagnóstico de
+    señal. Solo muestra una SpO₂ derivada de la banda con validación independiente.
+11. Compara la última noche con la mediana personal de pulso, HRV, respiración y
+    horario. Compara el pulso en kilómetros de GPS de la misma ruta y ritmo
+    similar, con cobertura de señal suficiente.
+12. En Hoy, muestra pulso en vivo y permite ordenar u ocultar tarjetas. Pon
+    sincronización, historial, actividad y diario en un menú discreto. Pon
+    Perfil y ajustes al final de Salud.
 
 Para cada función: lógica pura en lib/compute/, tests de unidad, pantalla con
 tests de widget, y registra en sus tablas cualquier preferencia guardada nueva
@@ -126,7 +143,7 @@ tests de widget, y registra en sus tablas cualquier preferencia guardada nueva
   Signing.xcconfig con identificadores únicos y mi Team ID (no lo subas a git).
 - Instálala en mi iPhone con `flutter run --release -d <id>` y explícame cómo
   confiar en el desarrollador y activar el Modo desarrollador.
-- Si mi iPhone tiene iOS 26, necesito Xcode 26 (macOS 15.6 o más nuevo).
+- Comprueba qué Xcode y macOS se necesitan para mi versión de iOS y para compilar las dependencias.
 - Guarda el trabajo en git con commits claros y no publiques mis datos
   personales (usa mi correo "noreply" de GitHub).
 

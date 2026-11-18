@@ -3817,6 +3817,10 @@ class LocalRepositoryImpl extends LocalRepository {
   }
 
   @override
+  Future<void> deleteJournal(String date) =>
+      _serialJournalMetrics(() => LocalDb.deleteJournal(date));
+
+  @override
   Future<Map<String, JournalMetricValue>> getJournalMetrics(String date) =>
       LocalDb.journalMetricsForDay(date);
 

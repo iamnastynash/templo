@@ -8,6 +8,8 @@
 //
 // Pure models + maths; persistence is lib/state/pulso_store.dart.
 
+import 'dart:math' as math;
+
 typedef HrPt = ({int t, double v});
 
 enum FocusKind { trabajo, trading }
@@ -22,20 +24,23 @@ class Trade {
   /// Live HR minus the base when the trade was opened, or null with no live HR.
   final double? entryAbove;
 
-  Trade(this.start, {this.end, this.result, this.entryAbove});
+  final double? entryBpm;
+
+  Trade(this.start, {this.end, this.result, this.entryAbove, this.entryBpm});
 
   Map<String, Object?> toJson() =>
-      {'s': start, 'e': end, 'r': result, 'a': entryAbove};
+      {'s': start, 'e': end, 'r': result, 'a': entryAbove, 'bpm': entryBpm};
   factory Trade.fromJson(Map m) => Trade((m['s'] as num).toInt(),
       end: (m['e'] as num?)?.toInt(),
       result: m['r'] as String?,
-      entryAbove: (m['a'] as num?)?.toDouble());
+      entryAbove: (m['a'] as num?)?.toDouble(),
+      entryBpm: (m['bpm'] as num?)?.toDouble());
 }
 
 class FocusSession {
   final String id;
   final FocusKind kind;
-  final int start;
+  int start;
   int? end;
   final List<Trade> trades;
 
@@ -86,11 +91,11 @@ class ResetResult {
 
 enum Light { calma, alerta, acelerado }
 
-/// Thresholds over the waking base: calm up to +5, alert to +12, then fast.
+/// Focus display thresholds, relative to waking pulse with a minimum per
+/// band of the indicator. These are interface settings, not clinical limits.
 Light lightFor(double hr, double base) {
-  final d = hr - base;
-  if (d <= 5) return Light.calma;
-  if (d <= 12) return Light.alerta;
+  if (hr < math.max(80, base + 12)) return Light.calma;
+  if (hr < math.max(95, base + 22)) return Light.alerta;
   return Light.acelerado;
 }
 
@@ -132,7 +137,9 @@ WindowStats windowStats(List<HrPt> hr, int start, int end) {
 List<HrPt> bestHr(List<HrPt> bandMinutes, FocusSession s) {
   final end = s.end ?? (s.samples.isEmpty ? s.start : s.samples.last.t + 30);
   final band = [for (final p in bandMinutes) if (p.t >= s.start && p.t < end) p];
-  return band.length >= 5 ? band : s.samples;
+  return band.length >= 5 ? band : [
+    for (final p in s.samples) if (p.t >= s.start && p.t <= end) p,
+  ];
 }
 
 // ── the 20-trade insight ───────────────────────────────────────────────────
@@ -160,11 +167,11 @@ String? tradingInsight(List<FocusSession> sessions) {
   final d = l - w;
   if (d >= 3) {
     return 'Tus trades perdidos empezaron con ${d.round()} lpm más que los '
-        'ganados. Entrar en calma te sale mejor.';
+        'ganados. La comparación muestra una asociación.';
   }
   if (d <= -3) {
     return 'Tus trades ganados empezaron con ${(-d).round()} lpm más que los '
-        'perdidos: algo de activación te ayuda.';
+        'perdidos: la diferencia es descriptiva.';
   }
   return 'Tu pulso al entrar es parecido en trades ganados y perdidos.';
 }

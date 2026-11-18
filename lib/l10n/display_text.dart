@@ -15,8 +15,20 @@ String withIosUninstallWarning(BuildContext context, String body) =>
         ? '$body\n\n${AppLocalizations.of(context)?.iosUninstallUnpairsWarning ?? "On iOS, deleting Templo also unpairs every band and sensor paired here from the phone, so other apps, including the maker's own, lose them too."}'
         : body;
 
-String journalTagText(BuildContext context, String tag) =>
-    localizedJournalTag(AppLocalizations.of(context), tag);
+const kTemploQuickTags = <String, (String, String)>{
+  'late_caffeine': ('Café tarde', 'Late caffeine'),
+  'late_workout': ('Entreno nocturno', 'Late workout'),
+  'high_stress_day': ('Día intenso', 'Intense day'),
+  'late_meal': ('Cena tarde', 'Late dinner'),
+};
+
+String journalTagText(BuildContext context, String tag) {
+  final pair = kTemploQuickTags[tag];
+  if (pair != null) {
+    return Localizations.localeOf(context).languageCode == 'es' ? pair.$1 : pair.$2;
+  }
+  return localizedJournalTag(AppLocalizations.of(context), tag);
+}
 
 /// Preset journal tags are stable storage keys. Translate them only at the
 /// presentation boundary so saved data, AI extraction and correlations keep

@@ -24,6 +24,7 @@ import '../screens/home_screen.dart' show deviceBatteryOf;
 import 'data.dart';
 import 'devices.dart';
 import 'settings.dart';
+import '../screens/templo_today_layout.dart';
 
 // ══════════════════ shared list furniture ══════════════════
 
@@ -409,6 +410,12 @@ class ProfileHomeView extends StatelessWidget {
                       AppLocalizations.of(c)?.profileLanguage ?? 'Language',
                       sub: _languageLabel(c, c.watch<LocaleController>().code),
                       onTap: () => _pickLanguage(c))),
+                ]),
+                settingsGroup(c, l?.profileSettingsRow ?? 'Settings', [
+                  SetRow(LucideIcons.layoutDashboard, C.coral,
+                      Localizations.localeOf(c).languageCode == 'es'
+                          ? 'Personalizar Hoy' : 'Customize Today',
+                      onTap: () => goto(c, const TemploTodayLayout())),
                 ]),
                 settingsGroup(c, l?.profileYourDataGroup ?? 'Your data', [
                   SetRow(LucideIcons.database, C.green,

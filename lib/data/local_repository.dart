@@ -305,6 +305,8 @@ abstract class LocalRepository {
       throw UnimplementedError('re-layer: getJournal');
   Future<void> postJournal(String date, List<String> tags, String note) =>
       throw UnimplementedError('re-layer: postJournal');
+  Future<void> deleteJournal(String date) =>
+      throw UnimplementedError('re-layer: deleteJournal');
   Future<Map<String, dynamic>> getJournalInsights({String range = '90d'}) =>
       throw UnimplementedError('re-layer: getJournalInsights');
 

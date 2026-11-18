@@ -96,9 +96,14 @@ void main() {
 
   group('focus', () {
     test('traffic light thresholds', () {
-      expect(lightFor(75, 70), Light.calma);
-      expect(lightFor(80, 70), Light.alerta);
-      expect(lightFor(90, 70), Light.acelerado);
+      expect(lightFor(74, 56), Light.calma);
+      expect(lightFor(79, 62), Light.calma);
+      expect(lightFor(80, 62), Light.alerta);
+      expect(lightFor(81, 70), Light.calma);
+      expect(lightFor(82, 70), Light.alerta);
+      expect(lightFor(94, 70), Light.alerta);
+      expect(lightFor(95, 70), Light.acelerado);
+      expect(lightFor(100, 89), Light.calma);
     });
 
     test('session round-trips through JSON', () {

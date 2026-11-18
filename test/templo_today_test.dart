@@ -39,7 +39,13 @@ void main() {
       expect(find.text('SLEEP'), findsOneWidget);
       expect(find.text('78'), hasData ? findsOneWidget : findsNothing);
       expect(find.text('Your first weeks'), findsNothing);
+      expect(find.text('Activity'), findsNothing);
+      expect(find.text('History and details'), findsNothing);
+      await tester.tap(find.byTooltip('Today options'));
+      await tester.pumpAndSettle();
+      expect(find.text('History and details'), findsOneWidget);
       await tester.tap(find.text('Activity'));
+      await tester.pumpAndSettle();
       expect(openedActivity, isTrue);
       expect(tester.takeException(), isNull);
     });

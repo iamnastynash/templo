@@ -8,6 +8,9 @@ import 'health_screen.dart';
 import 'home_screen.dart' show go, pad;
 import 'pulso_day.dart';
 import 'pulso_health.dart';
+import 'templo_insights.dart';
+import 'templo_oxygen.dart';
+import 'templo_today_layout.dart';
 
 class TemploHealth extends StatelessWidget {
   const TemploHealth({super.key});
@@ -19,10 +22,7 @@ class TemploHealth extends StatelessWidget {
     return ListView(
       padding: pad,
       children: [
-        ScreenTitle(
-          AppLocalizations.of(context)?.healthTitle ?? 'Health',
-          trailing: const ProfileAvatar(accent: C.coral),
-        ),
+        ScreenTitle(AppLocalizations.of(context)?.healthTitle ?? 'Health'),
         const SizedBox(height: S.x3),
         for (final (title, subtitle, icon, destination) in [
           (
@@ -48,6 +48,24 @@ class TemploHealth extends StatelessWidget {
                 : 'Heart rate, HRV and sleep · 8 weeks',
             LucideIcons.trendingUp,
             const TrendScreen(),
+          ),
+          (
+            'Oxígeno',
+            'SpO₂ · oxímetro Bluetooth e historial',
+            LucideIcons.droplet,
+            const TemploOxygen(),
+          ),
+          (
+            'Tu noche habitual',
+            'Qué cambió frente a tus últimas noches',
+            LucideIcons.moon,
+            const TemploNight(),
+          ),
+          (
+            'Pulso al mismo ritmo',
+            'Compara carreras por la misma ruta',
+            LucideIcons.route,
+            const TemploRoutePulse(),
           ),
         ])
           Padding(
@@ -81,6 +99,27 @@ class TemploHealth extends StatelessWidget {
               Scaffold(appBar: AppBar(), body: const HealthScreen()),
             ),
             child: Text(es ? 'Todas las métricas' : 'All metrics'),
+          ),
+        ),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: TextButton.icon(
+            onPressed: () => go(context, const TemploTodayLayout()),
+            icon: const Icon(LucideIcons.layoutDashboard, size: 16),
+            label: Text(es ? 'Personalizar Hoy' : 'Customize Today'),
+          ),
+        ),
+        Divider(color: p.line),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: TextButton.icon(
+            onPressed: () => openProfile(context),
+            icon: Icon(LucideIcons.settings, size: 16, color: p.ink3),
+            label: Text(
+              AppLocalizations.of(context)?.homeProfileSettings ??
+                  'Profile and settings',
+              style: F.cap.copyWith(color: p.ink3),
+            ),
           ),
         ),
       ],

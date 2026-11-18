@@ -28,6 +28,7 @@ void main() {
 
       expect(find.text('RECUPERACIÓN'), findsOneWidget);
       expect(find.text('Pulso en vivo'), findsOneWidget);
+      expect(find.text('Perfil y ajustes'), findsNothing);
       expect(app.state.debugLiveOwners.visibleLiveHrView, isTrue);
       app.state.device
         ..connection = 'connected'
@@ -56,6 +57,11 @@ void main() {
       expect(find.text('Salud cardiovascular'), findsOneWidget);
       expect(find.text('Edad del cuerpo'), findsOneWidget);
       expect(find.text('Tendencia'), findsOneWidget);
+      expect(find.text('Oxígeno'), findsOneWidget);
+      expect(find.text('Tu noche habitual'), findsOneWidget);
+      expect(find.text('Pulso al mismo ritmo'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('Perfil y ajustes'), 220);
+      expect(find.text('Perfil y ajustes'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }
